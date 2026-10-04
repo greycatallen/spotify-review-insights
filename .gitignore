@@ -1,0 +1,17 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Local state and reports
+state/
+*.sqlite
+*.sqlite-*
+local-reference.json
+self-check.json
+__pycache__/
+.pytest_cache/
+.DS_Store
+
+# Large source data (re-download per dataset README)
+Final Assignment - Spotify Reviews Dataset/spotify_reviews_18months.csv
