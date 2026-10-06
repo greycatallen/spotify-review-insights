@@ -1,0 +1,13 @@
+{
+  "budget_usd": 15.0,
+  "local_compute": {
+    "_comment": "Local CPU work (ingest, SQL, export) on the student's laptop. Unknown values stay null and are reported as unknown, not zero.",
+    "average_power_watts": null,
+    "device": "Apple Mac laptop",
+    "electricity_usd_per_kwh": null,
+    "estimated_usd": null
+  },
+  "measured": {},
+  "projection": {},
+  "rate_multiplier": 1.0
+}

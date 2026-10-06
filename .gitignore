@@ -15,3 +15,5 @@ __pycache__/
 
 # Large source data (re-download per dataset README)
 Final Assignment - Spotify Reviews Dataset/spotify_reviews_18months.csv
+.venv/
+.claude/settings.local.json

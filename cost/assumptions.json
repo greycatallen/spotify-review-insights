@@ -1,0 +1,26 @@
+{
+  "_comment": "Editable scenario assumptions. Measured pilot numbers live in pilot_calls.jsonl / pilot_runs.json and are never edited here.",
+  "budget_usd": 15.0,
+  "full_run": {
+    "input_rows": 660622,
+    "nonempty_texts": 660609,
+    "empty_text_quarantines": 13,
+    "distinct_nonempty_texts": 484189
+  },
+  "max_output_tokens_per_request": 4096,
+  "max_concurrency": 2,
+  "max_fallback_fraction": 0.02,
+  "verify_fraction": 0.01,
+  "scenarios": {
+    "base": {"extra_retry_fraction": 0.02, "fallback_fraction": 0.01, "group_memo_scale": 3.0, "worker_speedup": 1.8},
+    "conservative": {"extra_retry_fraction": 0.10, "fallback_fraction": 0.02, "group_memo_scale": 6.0, "worker_speedup": 1.3}
+  },
+  "fallback_model": {"provider": "anthropic", "model": "claude-sonnet-5-5", "tier": "standard"},
+  "one_time_overhead_seconds": {"ingest_profile_full_csv": 64.2, "export_and_check": null},
+  "local_compute": {
+    "_comment": "Local CPU work (ingest, SQL, export) on the student's laptop. Unknown values stay null and are reported as unknown, not zero.",
+    "device": "Apple Mac laptop",
+    "average_power_watts": null,
+    "electricity_usd_per_kwh": null
+  }
+}

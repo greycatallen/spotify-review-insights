@@ -1,0 +1,16 @@
+provider,model,tier,item,price_usd,per_units,currency,checked_date,source_url,notes
+anthropic,claude-haiku-4-5,standard,input_tokens,1.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,uncached input only (Anthropic usage.input_tokens excludes cache reads/writes)
+anthropic,claude-haiku-4-5,standard,cache_write_5m_tokens,1.25,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,1.25x base input
+anthropic,claude-haiku-4-5,standard,cache_read_tokens,0.10,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,0.1x base input
+anthropic,claude-haiku-4-5,standard,output_tokens,5.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+anthropic,claude-haiku-4-5,batch,input_tokens,0.50,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,Batch API 50% discount; scenario use only unless batch was actually used
+anthropic,claude-haiku-4-5,batch,cache_write_5m_tokens,0.625,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,cache multipliers stack with batch discount
+anthropic,claude-haiku-4-5,batch,cache_read_tokens,0.05,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,cache multipliers stack with batch discount
+anthropic,claude-haiku-4-5,batch,output_tokens,2.50,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+anthropic,claude-sonnet-5-5,standard,input_tokens,2.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,capped fallback candidate
+anthropic,claude-sonnet-5-5,standard,cache_write_5m_tokens,2.50,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+anthropic,claude-sonnet-5-5,standard,cache_read_tokens,0.20,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+anthropic,claude-sonnet-5-5,standard,output_tokens,10.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+anthropic,claude-sonnet-5-5,batch,input_tokens,1.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+anthropic,claude-sonnet-5-5,batch,output_tokens,5.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
+typesafe,jev,standard,classification,,1,USD,,https://docs.typesafe.ai,UNKNOWN until checked against TypeSafe pricing/dashboard in step 2; blank price is reported as unknown never as zero
