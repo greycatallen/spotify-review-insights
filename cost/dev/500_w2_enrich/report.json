@@ -1,0 +1,243 @@
+{
+  "budget_usd": 30.0,
+  "local_compute": {
+    "_comment": "Local CPU work (ingest, SQL, export) on the student's laptop. Unknown values stay null and are reported as unknown, not zero.",
+    "average_power_watts": null,
+    "device": "Apple Mac laptop",
+    "electricity_usd_per_kwh": null,
+    "estimated_usd": null
+  },
+  "measured": {
+    "cold": {
+      "api_cost": {
+        "known_part_usd": 0.016472,
+        "unknown_items": 0,
+        "usd": 0.016472
+      },
+      "batch_size": {
+        "claude": 25,
+        "jev": 1
+      },
+      "completed": 500,
+      "cost_per_1000_input_rows_usd": 0.032944,
+      "cost_per_completed_record_usd": 3.294e-05,
+      "failed": 0,
+      "ids_match_cost_100": null,
+      "input_rows": 500,
+      "input_sha256": "a94e31663ee7b7eaa77e23b7a8425b530cc0c866ed5e714953172a0afef6a12f",
+      "label_config": "jev-1.13.0+jevq-v2+a5-common-v1",
+      "provider_prompt_cache_read_tokens": 0,
+      "quarantined": 0,
+      "result_cache_hits": 21,
+      "run_id": "dev500-cold-20261006T185616.544+0000",
+      "stages": {
+        "enrich": {
+          "cache_read_tokens": 0,
+          "cost": {
+            "known_part_usd": 0.016472,
+            "unknown_items": 0,
+            "usd": 0.016472
+          },
+          "failed": 0,
+          "fallback_requests": 0,
+          "input_tokens": 392192,
+          "output_tokens": 79714,
+          "requests": 479,
+          "retries": 0,
+          "reviews_sent": 479,
+          "seconds": 26.786,
+          "settings": [
+            "{\"model\": \"jev-1.13.0\", \"needs_review_conf_lt\": 0.35, \"prompt_version\": \"jevq-v2\", \"reviews_per_request\": 1, \"sdk_retries\": 0, \"thinking\": \"n/a (System One: no generated text)\", \"timeout_s\": 30.0}"
+          ],
+          "usage_missing_calls": 0
+        },
+        "group": {
+          "cache_read_tokens": 0,
+          "cost": {
+            "known_part_usd": 0.0,
+            "unknown_items": 0,
+            "usd": 0.0
+          },
+          "failed": 0,
+          "fallback_requests": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0,
+          "retries": 0,
+          "reviews_sent": 0,
+          "seconds": null,
+          "settings": [],
+          "usage_missing_calls": 0
+        },
+        "memo": {
+          "cache_read_tokens": 0,
+          "cost": {
+            "known_part_usd": 0.0,
+            "unknown_items": 0,
+            "usd": 0.0
+          },
+          "failed": 0,
+          "fallback_requests": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0,
+          "retries": 0,
+          "reviews_sent": 0,
+          "seconds": null,
+          "settings": [],
+          "usage_missing_calls": 0
+        },
+        "verify": {
+          "cache_read_tokens": 0,
+          "cost": {
+            "known_part_usd": 0.0,
+            "unknown_items": 0,
+            "usd": 0.0
+          },
+          "failed": 0,
+          "fallback_requests": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0,
+          "retries": 0,
+          "reviews_sent": 0,
+          "seconds": null,
+          "settings": [],
+          "usage_missing_calls": 0
+        }
+      },
+      "started_at": "2026-10-06T18:56:44.154+00:00",
+      "throughput_rows_per_s": 18.666,
+      "unique_texts": 479,
+      "wall_seconds": 26.786,
+      "workers": 2
+    }
+  },
+  "projection": {
+    "base": {
+      "api_total": {
+        "known_part_usd": 20.980091,
+        "unknown_items": 1,
+        "usd": null
+      },
+      "assumptions": {
+        "extra_retry_fraction": 0.02,
+        "fallback_fraction": 0.005,
+        "group_memo_scale": 3.0,
+        "worker_speedup": 1.8
+      },
+      "cost_by_stage_usd": {
+        "enrich": 16.9834,
+        "fallback": 3.9966,
+        "group_memo": 0.0,
+        "verify": null
+      },
+      "elapsed_hours_modeled": 4.28,
+      "elapsed_unknown_stages": [
+        "verify",
+        "group_memo"
+      ],
+      "empty_quarantines": 13,
+      "exact_text_reuse": true,
+      "fallback_cost_basis": "modeled from enrich tokens at fallback rates",
+      "nonempty_outputs": 660609,
+      "over_budget": false,
+      "rows_accounted": 660622,
+      "work_texts": 484189
+    },
+    "base_no_reuse": {
+      "api_total": {
+        "known_part_usd": 28.624436,
+        "unknown_items": 1,
+        "usd": null
+      },
+      "assumptions": {
+        "extra_retry_fraction": 0.02,
+        "fallback_fraction": 0.005,
+        "group_memo_scale": 3.0,
+        "worker_speedup": 1.8
+      },
+      "cost_by_stage_usd": {
+        "enrich": 23.1716,
+        "fallback": 5.4529,
+        "group_memo": 0.0,
+        "verify": null
+      },
+      "elapsed_hours_modeled": 5.83,
+      "elapsed_unknown_stages": [
+        "verify",
+        "group_memo"
+      ],
+      "empty_quarantines": 13,
+      "exact_text_reuse": false,
+      "fallback_cost_basis": "modeled from enrich tokens at fallback rates",
+      "nonempty_outputs": 660609,
+      "over_budget": false,
+      "rows_accounted": 660622,
+      "work_texts": 660609
+    },
+    "conservative": {
+      "api_total": {
+        "known_part_usd": 34.302051,
+        "unknown_items": 1,
+        "usd": null
+      },
+      "assumptions": {
+        "extra_retry_fraction": 0.1,
+        "fallback_fraction": 0.02,
+        "group_memo_scale": 6.0,
+        "worker_speedup": 1.3
+      },
+      "cost_by_stage_usd": {
+        "enrich": 18.3155,
+        "fallback": 15.9866,
+        "group_memo": 0.0,
+        "verify": null
+      },
+      "elapsed_hours_modeled": 6.38,
+      "elapsed_unknown_stages": [
+        "verify",
+        "group_memo"
+      ],
+      "empty_quarantines": 13,
+      "exact_text_reuse": true,
+      "fallback_cost_basis": "modeled from enrich tokens at fallback rates",
+      "nonempty_outputs": 660609,
+      "over_budget": true,
+      "rows_accounted": 660622,
+      "work_texts": 484189
+    },
+    "conservative_no_reuse": {
+      "api_total": {
+        "known_part_usd": 46.80041,
+        "unknown_items": 1,
+        "usd": null
+      },
+      "assumptions": {
+        "extra_retry_fraction": 0.1,
+        "fallback_fraction": 0.02,
+        "group_memo_scale": 6.0,
+        "worker_speedup": 1.3
+      },
+      "cost_by_stage_usd": {
+        "enrich": 24.9889,
+        "fallback": 21.8115,
+        "group_memo": 0.0,
+        "verify": null
+      },
+      "elapsed_hours_modeled": 8.7,
+      "elapsed_unknown_stages": [
+        "verify",
+        "group_memo"
+      ],
+      "empty_quarantines": 13,
+      "exact_text_reuse": false,
+      "fallback_cost_basis": "modeled from enrich tokens at fallback rates",
+      "nonempty_outputs": 660609,
+      "over_budget": true,
+      "rows_accounted": 660622,
+      "work_texts": 660609
+    }
+  },
+  "rate_multiplier": 1.0
+}

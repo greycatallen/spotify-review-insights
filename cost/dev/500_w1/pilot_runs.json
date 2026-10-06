@@ -1,0 +1,125 @@
+[
+  {
+    "batch_size": {
+      "claude": 25,
+      "jev": 1
+    },
+    "completed": 500,
+    "enrich_stats": {
+      "fallback": {
+        "batches_failed": 0,
+        "batches_ok": 0,
+        "records_rejected": 0,
+        "records_saved": 0,
+        "stopped_reason": "completed",
+        "wall_seconds": 0.001
+      },
+      "primary": {
+        "batches_failed": 0,
+        "batches_ok": 479,
+        "records_rejected": 0,
+        "records_saved": 479,
+        "stopped_reason": "completed",
+        "wall_seconds": 54.979
+      }
+    },
+    "failed": 0,
+    "group": {
+      "cached": false,
+      "evidence_reviews_sent": 103,
+      "issues": 31,
+      "missing_names": [],
+      "named": 31,
+      "request_id": "req_011CfmVVuMn49hvir5yZFMgJ",
+      "unknown_ids_returned": []
+    },
+    "ids_match_input": true,
+    "ingest_seconds": 0.006,
+    "input_rows": 500,
+    "input_sha256": "a94e31663ee7b7eaa77e23b7a8425b530cc0c866ed5e714953172a0afef6a12f",
+    "issues": 31,
+    "label_config": "jev-1.13.0+jevq-v2+a5-common-v1",
+    "ledger_committed_usd_after": 0.06099,
+    "memo_attempts": 1,
+    "memo_audit": {
+      "claims_cited": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20",
+        "C21",
+        "C22",
+        "C23",
+        "C24"
+      ],
+      "unexplained_numbers": [],
+      "unknown_claim_ids": []
+    },
+    "memo_cached": false,
+    "quarantined": 0,
+    "result_cache_hits": 21,
+    "run_id": "dev500-cold-20261006T185338.241+0000",
+    "run_kind": "cold",
+    "settings": {
+      "fallback": {
+        "max_tokens": "80/review + 200, cap 4096",
+        "prompt_version": "claude-v1",
+        "sdk_retries": 0,
+        "temperature": "default",
+        "thinking": "off (not requested)"
+      },
+      "fallback_cap_fraction": 0.02,
+      "jev": {
+        "needs_review_conf_lt": 0.35,
+        "prompt_version": "jevq-v2",
+        "reviews_per_request": 1,
+        "sdk_retries": 0,
+        "thinking": "n/a (System One: no generated text)",
+        "timeout_s": 30.0
+      },
+      "verify": {
+        "max_tokens": "80/review + 200, cap 4096",
+        "prompt_version": "claude-v1",
+        "sdk_retries": 0,
+        "temperature": "default",
+        "thinking": "off (not requested)"
+      },
+      "verify_fraction": 0.1
+    },
+    "stage_seconds": {
+      "enrich": 54.98,
+      "group": 14.688,
+      "memo": 5.439,
+      "verify": 42.854
+    },
+    "stages_run": "all",
+    "started_at": "2026-10-06T18:55:37.003+00:00",
+    "unique_texts": 479,
+    "verify_stats": {
+      "agree_intent": 55,
+      "agree_severity": 52,
+      "agree_topic": 55,
+      "cached": 0,
+      "compared": 65,
+      "sent": 65
+    },
+    "wall_seconds": 117.975,
+    "workers": 1
+  }
+]

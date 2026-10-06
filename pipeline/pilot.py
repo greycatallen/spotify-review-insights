@@ -32,10 +32,12 @@ FALLBACK_CAP_FRACTION = 0.02 # at most 2% of distinct texts may go to the fallba
 WORKERS, JEV_BATCH, CLAUDE_BATCH = 1, 1, 25
 
 
-def run_once(con, kind, ledger_cap, log=print):
+def run_once(con, kind, ledger_cap, *, input_csv=COST_100_CSV, name="pilot", workers=WORKERS,
+             verify_fraction=VERIFY_FRACTION, enrich_only=False, max_batches=None, log=print):
+    """One run of the configured pipeline on the state in `con`. Shared by the pilot and dev checkpoints."""
     from .backends.claude import ClaudeBackend
     from .backends.jev import JevBackend
-    run_id = f"pilot-{kind}-" + now().replace(":", "").replace("-", "")
+    run_id = f"{name}-{kind}-" + now().replace(":", "").replace("-", "")
     ledger = SpendLedger(con, ledger_cap, run_id)
     jev = JevBackend()
     fallback = ClaudeBackend("claude-haiku-4-5", route="fallback")
@@ -45,16 +47,21 @@ def run_once(con, kind, ledger_cap, log=print):
 
     t = time.perf_counter()
     s1 = run_enrichment(con, jev, run_id=run_id, phase="initial", ledger=ledger, limiter=RateLimiter(3000, 5_000_000),
-                        batch_size=JEV_BATCH, workers=WORKERS, max_attempts=3, done_configs=configs, log=log)
+                        batch_size=JEV_BATCH, workers=workers, max_attempts=3, done_configs=configs,
+                        max_batches=max_batches, log=log)
     n_texts = con.execute("SELECT count(*) FROM texts").fetchone()[0]
     s2 = run_enrichment(con, fallback, run_id=run_id, phase="initial", ledger=ledger, limiter=RateLimiter(50),
                         batch_size=CLAUDE_BATCH, workers=1, max_attempts=3, done_configs=configs,
                         fallback_from=jev.label_config, fallback_cap=max(1, int(n_texts * FALLBACK_CAP_FRACTION)),
                         log=log)
     stage["enrich"] = round(time.perf_counter() - t, 3)
+    v, g, m, counts = {}, {}, {"audit": None, "cached": None, "attempts": 0}, {}
+    if enrich_only:
+        return _finish(con, run_id, kind, input_csv, workers, verify_fraction, stage, t_all, jev, fallback, verifier,
+                       configs, s1, s2, v, g, counts, m, ledger)
 
     t = time.perf_counter()
-    sample = sample_for_verification(con, jev.label_config, VERIFY_FRACTION)
+    sample = sample_for_verification(con, jev.label_config, verify_fraction)
     v = run_verify(con, verifier, sample, run_id=run_id, ledger=ledger, primary_config=jev.label_config,
                    batch_size=CLAUDE_BATCH, log=log)
     stage["verify"] = round(time.perf_counter() - t, 3)
@@ -67,28 +74,38 @@ def run_once(con, kind, ledger_cap, log=print):
     records = list(iter_records(con, configs))
     sev = {r["review_id"]: r["severity"] for r in records if r["status"] == "completed"}
     vr = verification_report(con, verifier.label_config, jev.label_config)
-    context = {"reviews_in_pilot": len(records), "completed": len(sev),
+    context = {"reviews_in_run": len(records), "completed": len(sev),
                "quarantined": sum(r["status"] == "quarantined" for r in records),
                "verification_sample": vr["compared"], "verification_topic_agreement": vr["topic_agreement"],
                "verification_intent_agreement": vr["intent_agreement"]}
     t = time.perf_counter()
     m = write_memo(con, sev, context, run_id=run_id, ledger=ledger)
     stage["memo"] = round(time.perf_counter() - t, 3)
+    return _finish(con, run_id, kind, input_csv, workers, verify_fraction, stage, t_all, jev, fallback, verifier,
+                   configs, s1, s2, v, g, counts, m, ledger)
+
+
+def _finish(con, run_id, kind, input_csv, workers, verify_fraction, stage, t_all, jev, fallback, verifier, configs,
+            s1, s2, v, g, counts, m, ledger):
     wall = round(time.perf_counter() - t_all, 3)
+    records = list(iter_records(con, configs))
+    sev = {r["review_id"]: r["severity"] for r in records if r["status"] == "completed"}
+    n_texts = con.execute("SELECT count(*) FROM texts").fetchone()[0]
 
     calls = [dict(r) for r in con.execute("SELECT * FROM calls WHERE run_id=? ORDER BY started_at", (run_id,))]
-    run = {"run_id": run_id, "run_kind": kind, "started_at": now(), "input_sha256": checker.sha(COST_100_CSV),
+    run = {"run_id": run_id, "run_kind": kind, "started_at": now(), "input_sha256": checker.sha(input_csv),
            "input_rows": len(records), "completed": len(sev), "failed": sum(
                r["status"] == "quarantined" and r.get("reason") != "empty_review_text" for r in records),
            "quarantined": sum(r["status"] == "quarantined" for r in records), "unique_texts": n_texts,
            "result_cache_hits": len(sev) - sum(len(json.loads(c["review_ids"])) for c in calls
                                                if c["role"] == "enrich" and c["outcome"] == "succeeded"),
-           "workers": WORKERS, "batch_size": {"jev": JEV_BATCH, "claude": CLAUDE_BATCH}, "wall_seconds": wall,
+           "workers": workers, "batch_size": {"jev": JEV_BATCH, "claude": CLAUDE_BATCH}, "wall_seconds": wall,
            "stage_seconds": stage, "label_config": jev.label_config,
            "settings": {"jev": jev.settings, "fallback": fallback.settings, "verify": verifier.settings,
-                        "verify_fraction": VERIFY_FRACTION, "fallback_cap_fraction": FALLBACK_CAP_FRACTION},
+                        "verify_fraction": verify_fraction, "fallback_cap_fraction": FALLBACK_CAP_FRACTION},
            "enrich_stats": {"primary": vars(s1), "fallback": vars(s2)}, "verify_stats": v, "group": g,
            "issues": len(counts), "memo_audit": m["audit"], "memo_cached": m["cached"], "memo_attempts": m["attempts"],
+           "stages_run": "enrich only" if not v and not g else "all",
            "ledger_committed_usd_after": round(ledger.committed(), 6)}
     return run, calls, records, m
 
