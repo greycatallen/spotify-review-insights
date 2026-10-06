@@ -1,0 +1,256 @@
+[
+  {
+    "batch_size": {
+      "claude": 25,
+      "jev": 1
+    },
+    "completed": 100,
+    "enrich_stats": {
+      "fallback": {
+        "batches_failed": 0,
+        "batches_ok": 0,
+        "records_rejected": 0,
+        "records_saved": 0,
+        "stopped_reason": "completed",
+        "wall_seconds": 0.0
+      },
+      "primary": {
+        "batches_failed": 0,
+        "batches_ok": 100,
+        "records_rejected": 0,
+        "records_saved": 100,
+        "stopped_reason": "completed",
+        "wall_seconds": 40.15
+      }
+    },
+    "failed": 0,
+    "group": {
+      "cached": false,
+      "evidence_reviews_sent": 47,
+      "issues": 21,
+      "missing_names": [],
+      "named": 21,
+      "request_id": "req_011CfmUktH6V7XEEcKSqNCHA",
+      "unknown_ids_returned": []
+    },
+    "ids_match_cost_100": true,
+    "ingest_seconds": 0.002,
+    "input_rows": 100,
+    "input_sha256": "c884ac3b9be5066995d5063f96ad9af6e5e082975788c1684c4f6b6ea661dd0e",
+    "issues": 21,
+    "label_config": "jev-1.13.0+jevq-v2+a5-common-v1",
+    "ledger_committed_usd_after": 0.023807,
+    "memo_audit": {
+      "claims_cited": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20",
+        "C21",
+        "C22",
+        "C23",
+        "C24"
+      ],
+      "unexplained_numbers": [
+        "1.91",
+        "2.67",
+        "3.0",
+        "90.91",
+        "95.45"
+      ],
+      "unknown_claim_ids": []
+    },
+    "memo_cached": false,
+    "quarantined": 0,
+    "result_cache_hits": 0,
+    "run_id": "pilot-cold-20261006T184439.794+0000",
+    "run_kind": "cold",
+    "settings": {
+      "fallback": {
+        "max_tokens": "80/review + 200, cap 4096",
+        "prompt_version": "claude-v1",
+        "sdk_retries": 0,
+        "temperature": "default",
+        "thinking": "off (not requested)"
+      },
+      "fallback_cap_fraction": 0.02,
+      "jev": {
+        "needs_review_conf_lt": 0.35,
+        "prompt_version": "jevq-v2",
+        "reviews_per_request": 1,
+        "sdk_retries": 0,
+        "thinking": "n/a (System One: no generated text)",
+        "timeout_s": 30.0
+      },
+      "verify": {
+        "max_tokens": "80/review + 200, cap 4096",
+        "prompt_version": "claude-v1",
+        "sdk_retries": 0,
+        "temperature": "default",
+        "thinking": "off (not requested)"
+      },
+      "verify_fraction": 0.2
+    },
+    "stage_seconds": {
+      "enrich": 40.151,
+      "group": 12.044,
+      "memo": 6.867,
+      "verify": 12.628
+    },
+    "started_at": "2026-10-06T18:45:52.258+00:00",
+    "unique_texts": 100,
+    "verify_stats": {
+      "agree_intent": 21,
+      "agree_severity": 20,
+      "agree_topic": 20,
+      "cached": 0,
+      "compared": 22,
+      "sent": 22
+    },
+    "wall_seconds": 71.692,
+    "workers": 1
+  },
+  {
+    "batch_size": {
+      "claude": 25,
+      "jev": 1
+    },
+    "completed": 100,
+    "enrich_stats": {
+      "fallback": {
+        "batches_failed": 0,
+        "batches_ok": 0,
+        "records_rejected": 0,
+        "records_saved": 0,
+        "stopped_reason": "completed",
+        "wall_seconds": 0.0
+      },
+      "primary": {
+        "batches_failed": 0,
+        "batches_ok": 0,
+        "records_rejected": 0,
+        "records_saved": 0,
+        "stopped_reason": "completed",
+        "wall_seconds": 0.0
+      }
+    },
+    "failed": 0,
+    "group": {
+      "cached": true,
+      "evidence_reviews_sent": 47,
+      "issues": 21,
+      "missing_names": [],
+      "named": 21,
+      "request_id": "req_011CfmUktH6V7XEEcKSqNCHA",
+      "unknown_ids_returned": []
+    },
+    "ids_match_cost_100": true,
+    "ingest_seconds": 0.0,
+    "input_rows": 100,
+    "input_sha256": "c884ac3b9be5066995d5063f96ad9af6e5e082975788c1684c4f6b6ea661dd0e",
+    "issues": 21,
+    "label_config": "jev-1.13.0+jevq-v2+a5-common-v1",
+    "ledger_committed_usd_after": 0.023807,
+    "memo_audit": {
+      "claims_cited": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20",
+        "C21",
+        "C22",
+        "C23",
+        "C24"
+      ],
+      "unexplained_numbers": [
+        "1.91",
+        "2.67",
+        "3.0",
+        "90.91",
+        "95.45"
+      ],
+      "unknown_claim_ids": []
+    },
+    "memo_cached": true,
+    "quarantined": 0,
+    "result_cache_hits": 100,
+    "run_id": "pilot-warm-20261006T184552.270+0000",
+    "run_kind": "warm",
+    "settings": {
+      "fallback": {
+        "max_tokens": "80/review + 200, cap 4096",
+        "prompt_version": "claude-v1",
+        "sdk_retries": 0,
+        "temperature": "default",
+        "thinking": "off (not requested)"
+      },
+      "fallback_cap_fraction": 0.02,
+      "jev": {
+        "needs_review_conf_lt": 0.35,
+        "prompt_version": "jevq-v2",
+        "reviews_per_request": 1,
+        "sdk_retries": 0,
+        "thinking": "n/a (System One: no generated text)",
+        "timeout_s": 30.0
+      },
+      "verify": {
+        "max_tokens": "80/review + 200, cap 4096",
+        "prompt_version": "claude-v1",
+        "sdk_retries": 0,
+        "temperature": "default",
+        "thinking": "off (not requested)"
+      },
+      "verify_fraction": 0.2
+    },
+    "stage_seconds": {
+      "enrich": 0.001,
+      "group": 0.004,
+      "memo": 0.0,
+      "verify": 0.0
+    },
+    "started_at": "2026-10-06T18:45:52.282+00:00",
+    "unique_texts": 100,
+    "verify_stats": {
+      "agree_intent": 0,
+      "agree_severity": 0,
+      "agree_topic": 0,
+      "cached": 22,
+      "compared": 0,
+      "sent": 0
+    },
+    "wall_seconds": 0.007,
+    "workers": 1
+  }
+]

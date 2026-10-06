@@ -13,4 +13,5 @@ anthropic,claude-sonnet-5-5,standard,cache_read_tokens,0.20,1000000,USD,2026-10-
 anthropic,claude-sonnet-5-5,standard,output_tokens,10.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
 anthropic,claude-sonnet-5-5,batch,input_tokens,1.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
 anthropic,claude-sonnet-5-5,batch,output_tokens,5.00,1000000,USD,2026-10-06,https://platform.claude.com/docs/en/about-claude/pricing,
-typesafe,jev,standard,classification,,1,USD,,https://docs.typesafe.ai,UNKNOWN until checked against TypeSafe pricing/dashboard in step 2; blank price is reported as unknown never as zero
+typesafe,jev-1.13.0,standard,input_tokens,0.042,1000000,USD,2026-10-06,https://docs.typesafe.ai/models,"$42/Btok = $0.042/Mtok; charged per input token"
+typesafe,jev-1.13.0,standard,output_tokens,0,1000000,USD,2026-10-06,https://docs.typesafe.ai/models,output tokens are free (reported usage kept for transparency)

@@ -113,6 +113,16 @@ CREATE TABLE IF NOT EXISTS membership (
     PRIMARY KEY (issue_id, review_id)
 );
 
+-- Downstream (group/memo) outputs cached by a hash of their exact inputs + model + prompt version.
+CREATE TABLE IF NOT EXISTS artifacts (
+    cache_key TEXT PRIMARY KEY,
+    role TEXT NOT NULL,
+    input_sha256 TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    output TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS verifications (
     review_id TEXT NOT NULL,
     label_config TEXT NOT NULL,

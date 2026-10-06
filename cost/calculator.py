@@ -132,6 +132,14 @@ def measured(priced, calls, runs):
                 "settings": sorted({json.dumps({"model": c["model"], **c.get("settings", {})}, sort_keys=True)
                                     for c in cs}),
             }
+            fb_ids = {c["request_id"] for c in cs if c.get("route") == "fallback"}
+            if fb_ids:
+                fm = Money()
+                for p in rp:
+                    if p["request_id"] in fb_ids:
+                        fm.add(p["item_cost_usd"])
+                stage[role]["fallback_cost"] = {**fm.as_dict(), "reviews": sum(
+                    len(c.get("review_ids", [])) for c in cs if c["request_id"] in fb_ids)}
         total = Money()
         for p in rp:
             total.add(p["item_cost_usd"])
@@ -166,13 +174,21 @@ def project(cold, assumptions, rates, budget, rate_multiplier):
     verify_unit = per_text("verify", st["verify"]["reviews_sent"])
     fixed_gm = Money().add(st["group"]["cost"]["usd"]).add(st["memo"]["cost"]["usd"]).value()
 
-    # Fallback per text: measured if the pilot used it, else enrich tokens/text at the fallback model's rates.
+    # Fallback per text: measured fallback calls if the pilot had any; otherwise the measured verify cost per
+    # review (same Claude backend and prompt); otherwise enrich tokens/text at the fallback model's rates.
     fb = assumptions["fallback_model"]
-    fb_in = rates.get((fb["provider"], fb["model"], fb["tier"], "input_tokens"), {}).get("unit_price")
-    fb_out = rates.get((fb["provider"], fb["model"], fb["tier"], "output_tokens"), {}).get("unit_price")
-    tok_in = st["enrich"]["input_tokens"] / enrich_texts
-    tok_out = st["enrich"]["output_tokens"] / enrich_texts
-    fallback_unit = (tok_in * fb_in + tok_out * fb_out) if (fb_in is not None and fb_out is not None and tok_in) else None
+    fb_calls = st["enrich"].get("fallback_cost")
+    if fb_calls and fb_calls["usd"] is not None and fb_calls["reviews"]:
+        fallback_unit, fallback_basis = fb_calls["usd"] / fb_calls["reviews"], "measured fallback calls"
+    elif verify_unit is not None:
+        fallback_unit, fallback_basis = verify_unit, "measured verify cost per review (same Claude backend)"
+    else:
+        fb_in = rates.get((fb["provider"], fb["model"], fb["tier"], "input_tokens"), {}).get("unit_price")
+        fb_out = rates.get((fb["provider"], fb["model"], fb["tier"], "output_tokens"), {}).get("unit_price")
+        tok_in = st["enrich"]["input_tokens"] / enrich_texts
+        tok_out = st["enrich"]["output_tokens"] / enrich_texts
+        fallback_unit = (tok_in * fb_in + tok_out * fb_out) if (fb_in is not None and fb_out is not None) else None
+        fallback_basis = "modeled from enrich tokens at fallback rates"
 
     sec = {r: st[r]["seconds"] for r in ROLES}
     overhead = sum(v for v in assumptions["one_time_overhead_seconds"].values() if v) or 0.0
@@ -202,7 +218,7 @@ def project(cold, assumptions, rates, budget, rate_multiplier):
             known_secs = [v for v in secs.values() if v is not None]
             t = total.value()
             out[f"{name}{'' if reuse else '_no_reuse'}"] = {
-                "exact_text_reuse": reuse, "work_texts": work,
+                "exact_text_reuse": reuse, "work_texts": work, "fallback_cost_basis": fallback_basis,
                 "rows_accounted": full["input_rows"], "nonempty_outputs": full["nonempty_texts"],
                 "empty_quarantines": full["empty_text_quarantines"],
                 "assumptions": sc, "cost_by_stage_usd": {k: (round(v, 4) if v is not None else None) for k, v in items.items()},
