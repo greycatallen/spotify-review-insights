@@ -24,6 +24,7 @@ from .pilot import run_once
 
 SETS = {"500": (CHECKPOINT_500_CSV, "checkpoint_500.csv", 0.10), "10000": (ANALYSIS_10000_CSV, "analysis_10000.csv", 0.02)}
 # Measured on the pilot (cost/report.md): per-review Jev enrich, per-review Haiku verify, fixed group+memo.
+GZIP_MIN_ROWS = 10_000
 EST = {"enrich": 0.0000345, "verify": 0.00043, "fixed": 0.011}
 
 
@@ -81,9 +82,11 @@ def main(argv=None):
     rows = [{**c, "run_kind": "cold", "review_ids": json.loads(c["review_ids"]), "settings": json.loads(c["settings"]),
              "extra": json.loads(c["extra"] or "{}"), "tier": "standard",
              "route": "fallback" if c["role"] == "enrich" and c["provider"] != "typesafe" else "primary"} for c in calls]
-    write_jsonl(out / "pilot_calls.jsonl", rows)
+    gz = n >= GZIP_MIN_ROWS   # large runs are stored gzipped (decided 2026-10-06; smaller runs stay readable)
+    suffix = ".gz" if gz else ""
+    write_jsonl(out / f"pilot_calls.jsonl{suffix}", rows, gz=gz)
     write_json(out / "pilot_runs.json", [run])
-    write_jsonl(out / "records.jsonl", records)
+    write_jsonl(out / f"records.jsonl{suffix}", records, gz=gz)
     if not a.enrich_only:
         (out / "memo.md").write_text(memo["memo"] + "\n", encoding="utf-8")
         write_json(out / "claims.json", {"claims": memo["claims"], "audit": memo["audit"]})

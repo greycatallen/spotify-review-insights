@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spotify Review Insights</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f6f5f2; --surface-1: #fcfcfb; --surface-2: #f0efec; --border: #e2e0da;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #77756f;
+  --accent: #2a78d6; --accent-weak: #cde2fb;
+  --seq-250: #86b6ef; --seq-350: #5598e7; --seq-450: #2a78d6; --seq-550: #1c5cab; --seq-650: #104281;
+  --series-2: #eb6834;
+  --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
+  --grid: #e9e7e2;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --surface-2: #242422; --border: #33332f;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #9b9a91;
+    --accent: #3987e5; --accent-weak: #1c3557;
+    --seq-250: #184f95; --seq-350: #1c5cab; --seq-450: #2a78d6; --seq-550: #5598e7; --seq-650: #9ec5f4;
+    --series-2: #d95926; --grid: #2b2b28;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --surface-2: #242422; --border: #33332f;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #9b9a91;
+  --accent: #3987e5; --accent-weak: #1c3557;
+  --seq-250: #184f95; --seq-350: #1c5cab; --seq-450: #2a78d6; --seq-550: #5598e7; --seq-650: #9ec5f4;
+  --series-2: #d95926; --grid: #2b2b28;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--accent); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; }
+h1 { font-size: 26px; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 18px; margin: 0 0 4px; }
+h3 { font-size: 15px; margin: 0 0 6px; }
+.sub { color: var(--text-secondary); margin: 2px 0 0; }
+.muted { color: var(--text-muted); font-size: 13px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
+.badge.warn { border-color: var(--warning); }
+.badge.ok { border-color: var(--good); }
+section { margin-top: 28px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.grid { display: grid; gap: 16px; }
+.kpis { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.kpi .v { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .l { color: var(--text-secondary); font-size: 13px; }
+.two { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.chart { position: relative; height: 260px; }
+details.table-view { margin-top: 8px; }
+details.table-view summary { cursor: pointer; color: var(--text-muted); font-size: 13px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--text-secondary); font-weight: 600; font-size: 13px; }
+td.num, th.num { text-align: right; }
+tbody tr.clickable { cursor: pointer; }
+tbody tr.clickable:hover, tbody tr.clickable:focus { background: var(--surface-2); outline: none; }
+.bar-cell { min-width: 150px; }
+.bar-cell .bc { display: flex; align-items: center; gap: 8px; }
+.bar-cell span.bar { display: inline-block; height: 8px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--accent); }
+.bar-cell span.lab { font-variant-numeric: tabular-nums; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.tabs button, .btn { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.rec { border-left: 3px solid var(--accent); }
+.rec .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text-primary); cursor: pointer; font-family: ui-monospace, monospace; }
+.chip.claim { cursor: default; }
+.top { background: var(--surface-1); border: 1px solid var(--accent); border-radius: var(--radius); padding: 16px 18px; }
+.top .area { font-size: 22px; font-weight: 700; }
+blockquote { margin: 6px 0; padding: 6px 10px; border-left: 3px solid var(--border); color: var(--text-secondary); }
+dialog { width: min(860px, 94vw); max-height: 86vh; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface-1); color: var(--text-primary); padding: 0; }
+dialog::backdrop { background: rgb(0 0 0 / 0.45); }
+dialog .dh { position: sticky; top: 0; background: var(--surface-1); padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+dialog .db { padding: 14px 18px; }
+.search { display: flex; gap: 8px; flex-wrap: wrap; }
+.search input, .search select { font: inherit; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary); }
+.notice { border: 1px dashed var(--warning); border-radius: var(--radius); padding: 12px 14px; background: var(--surface-1); }
+.scroll { overflow-x: auto; }
+@media (max-width: 600px) { .kpi .v { font-size: 22px; } h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Spotify Review Insights</h1>
+      <p class="sub" id="run-label">Loading…</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge" id="scope-badge"></span>
+      <button class="btn" id="theme-toggle" aria-label="Toggle dark mode">◐ Theme</button>
+    </div>
+  </header>
+
+  <section aria-labelledby="kpi-h">
+    <h2 id="kpi-h" class="sr-only" style="position:absolute;left:-9999px">Overall metrics</h2>
+    <div class="grid kpis" id="kpis"></div>
+  </section>
+
+  <section aria-labelledby="rec-h">
+    <h2 id="rec-h">AI recommendations</h2>
+    <p class="muted" id="rec-prov"></p>
+    <div id="recs"></div>
+  </section>
+
+  <section aria-labelledby="dist-h">
+    <h2 id="dist-h">What reviewers are saying</h2>
+    <p class="muted">Labels come from the review text only; star ratings are shown separately as metadata.</p>
+    <div class="grid two">
+      <div class="card"><h3>Review type (intent)</h3><div class="chart"><canvas id="c-intent"></canvas></div><div data-table="c-intent"></div></div>
+      <div class="card"><h3>Topic of every classified review</h3><div class="chart"><canvas id="c-topic"></canvas></div><div data-table="c-topic"></div></div>
+      <div class="card"><h3>Complaint share by topic</h3><p class="muted">Complaint + cancellation reviews ÷ all reviews in that topic.</p><div class="chart"><canvas id="c-ctopic"></canvas></div><div data-table="c-ctopic"></div></div>
+      <div class="card"><h3>Severity (1 = no problem … 5 = serious harm)</h3><div class="chart"><canvas id="c-sev"></canvas></div><div data-table="c-sev"></div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="trend-h">
+    <h2 id="trend-h">Trends</h2>
+    <p class="muted">First and last calendar months are partial (window 2022-05-17 → 2023-11-17); shares use each month's own denominator.</p>
+    <div class="grid two">
+      <div class="card"><h3>Classified reviews per month</h3><div class="chart"><canvas id="c-month"></canvas></div><div data-table="c-month"></div></div>
+      <div class="card"><h3>Complaint + cancellation share per month</h3><div class="chart"><canvas id="c-share"></canvas></div><div data-table="c-share"></div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Star rating vs. what the text says</h3>
+      <p class="muted">Each cell: reviews with that star rating and text-based intent. Shading = share within the star row.</p>
+      <div class="scroll" id="heatmap"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="iss-h">
+    <h2 id="iss-h">Issue ranking</h2>
+    <p class="muted">Baseline priority = complaint count × mean severity (= severity sum); ties by issue ID. Includes complaint and cancellation-intent reviews; each review belongs to exactly one issue. Click a row for its evidence.</p>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-kind="complaint">Complaint issues</button>
+      <button role="tab" aria-selected="false" data-kind="request">Feature-request themes</button>
+    </div>
+    <div class="card scroll"><table id="issues"></table></div>
+  </section>
+
+  <section aria-labelledby="look-h">
+    <h2 id="look-h">Look up reviews</h2>
+    <div class="card">
+      <form class="search" id="search">
+        <input name="q" placeholder="Text contains…" maxlength="80" aria-label="Search text">
+        <select name="topic" aria-label="Topic"><option value="">Any topic</option></select>
+        <select name="intent" aria-label="Intent"><option value="">Any intent</option></select>
+        <input name="id" placeholder="or exact review ID" aria-label="Review ID" style="min-width:260px">
+        <button class="btn">Search</button>
+      </form>
+      <div class="scroll" id="search-out" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="meth-h">
+    <h2 id="meth-h">Method, cost and limits</h2>
+    <div class="grid two">
+      <div class="card" id="method"></div>
+      <div class="card">
+        <h3>Limits</h3>
+        <ul class="sub" style="margin:0;padding-left:18px">
+          <li>Self-selected public Google Play reviews, May 2022 – Nov 2023; not a customer survey.</li>
+          <li>No revenue, plan tier or confirmed cancellations: cancellation language is stated intent, not churn.</li>
+          <li>Labels are model predictions (Jev) with an independent Haiku check on a sample; see agreement above.</li>
+          <li>Issue grouping is deterministic (topic + matched feature term); names are AI-suggested.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<dialog id="drawer" aria-labelledby="drawer-title">
+  <div class="dh"><div><h2 id="drawer-title"></h2><div class="muted" id="drawer-sub"></div></div>
+    <button class="btn" onclick="document.getElementById('drawer').close()" aria-label="Close">✕</button></div>
+  <div class="db" id="drawer-body"></div>
+</dialog>
+
+<script>
+const API = (window.API_BASE || "") + "/api";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => n == null ? "—" : Number(n).toLocaleString();
+const pct = (a, b) => b ? (100 * a / b).toFixed(1) + "%" : "—";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const get = p => fetch(API + p).then(r => { if (!r.ok) throw new Error(p + " " + r.status); return r.json(); });
+const INTENTS = ["complaint", "cancellation", "request", "praise", "unclear"];
+const TOPICS = ["access", "usability", "playback", "downloads", "catalog", "billing", "support", "other"];
+let charts = [], STATE = {};
+
+// Theme toggle: explicit stamp wins over the OS setting both ways.
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$("#theme-toggle").onclick = () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("theme", next); } catch (e) {}
+  drawCharts();
+};
+
+function tableView(id, head, rows) {
+  const el = document.querySelector(`[data-table="${id}"]`);
+  el.innerHTML = `<details class="table-view"><summary>View as table</summary><table><thead><tr>${head.map((h, i) =>
+    `<th class="${i ? "num" : ""}">${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((c, i) =>
+    `<td class="${i ? "num" : ""}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></details>`;
+}
+
+function baseOpts(horizontal, valueFmt) {
+  const grid = css("--grid"), ink = css("--text-secondary");
+  const value = { grid: { color: grid }, border: { display: false }, ticks: { color: ink, callback: v => valueFmt ? valueFmt(v) : fmt(v) }, beginAtZero: true };
+  const cat = { grid: { display: false }, border: { color: grid }, ticks: { color: ink } };
+  return { responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => valueFmt ? valueFmt(c.parsed[horizontal ? "x" : "y"]) : fmt(c.parsed[horizontal ? "x" : "y"]) } } },
+    indexAxis: horizontal ? "y" : "x", scales: horizontal ? { x: value, y: cat } : { x: cat, y: value } };
+}
+
+function bar(id, labels, values, { horizontal = true, color, valueFmt, colors } = {}) {
+  charts.push(new Chart(document.getElementById(id), { type: "bar",
+    data: { labels, datasets: [{ data: values, backgroundColor: colors || color || css("--accent"),
+      borderRadius: { topRight: 4, bottomRight: 4, topLeft: horizontal ? 0 : 4 }, borderSkipped: "start",
+      maxBarThickness: 18, categoryPercentage: 0.8 }] },
+    options: baseOpts(horizontal, valueFmt) }));
+}
+
+function drawCharts() {
+  charts.forEach(c => c.destroy()); charts = [];
+  const D = STATE.dist; if (!D) return;
+  const by = (name) => Object.fromEntries((D[name] || []).map(r => [r.k1, r.value]));
+  const intent = by("intent"), topic = by("topic"), sev = by("severity");
+  const total = Object.values(intent).reduce((a, b) => a + b, 0);
+  const iL = INTENTS.filter(k => intent[k] != null);
+  bar("c-intent", iL, iL.map(k => intent[k]));
+  tableView("c-intent", ["Intent", "Reviews", "Share"], iL.map(k => [k, fmt(intent[k]), pct(intent[k], total)]));
+  const tL = TOPICS.filter(k => topic[k] != null).sort((a, b) => topic[b] - topic[a]);
+  bar("c-topic", tL, tL.map(k => topic[k]));
+  tableView("c-topic", ["Topic", "Reviews", "Share"], tL.map(k => [k, fmt(topic[k]), pct(topic[k], total)]));
+  const ti = {}; (D.topic_intent || []).forEach(r => { (ti[r.k1] ||= {})[r.k2] = r.value; });
+  const share = tL.map(t => { const row = ti[t] || {}; const n = Object.values(row).reduce((a, b) => a + b, 0);
+    return [t, ((row.complaint || 0) + (row.cancellation || 0)), n]; }).sort((a, b) => b[1] / b[2] - a[1] / a[2]);
+  bar("c-ctopic", share.map(s => s[0]), share.map(s => 100 * s[1] / s[2]), { valueFmt: v => v.toFixed(0) + "%" });
+  tableView("c-ctopic", ["Topic", "Complaint+cancel", "All reviews", "Share"], share.map(s => [s[0], fmt(s[1]), fmt(s[2]), pct(s[1], s[2])]));
+  const sL = ["1", "2", "3", "4", "5"];
+  bar("c-sev", sL, sL.map(k => sev[k] || 0), { horizontal: false,
+    colors: ["--seq-250", "--seq-350", "--seq-450", "--seq-550", "--seq-650"].map(css) });
+  tableView("c-sev", ["Severity", "Reviews", "Share"], sL.map(k => [k, fmt(sev[k] || 0), pct(sev[k] || 0, total)]));
+  const mi = {}; (D.month_intent || []).forEach(r => { (mi[r.k1] ||= {})[r.k2] = r.value; });
+  const months = Object.keys(mi).sort();
+  const mTot = months.map(m => Object.values(mi[m]).reduce((a, b) => a + b, 0));
+  const mC = months.map(m => (mi[m].complaint || 0) + (mi[m].cancellation || 0));
+  bar("c-month", months, mTot, { horizontal: false });
+  tableView("c-month", ["Month", "Classified reviews"], months.map((m, i) => [m, fmt(mTot[i])]));
+  charts.push(new Chart(document.getElementById("c-share"), { type: "line",
+    data: { labels: months, datasets: [{ data: mC.map((c, i) => 100 * c / mTot[i]), borderColor: css("--accent"),
+      backgroundColor: css("--accent"), borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, tension: 0 }] },
+    options: { ...baseOpts(false, v => v.toFixed(0) + "%"), interaction: { mode: "index", intersect: false } } }));
+  tableView("c-share", ["Month", "Complaint+cancel", "All", "Share"], months.map((m, i) => [m, fmt(mC[i]), fmt(mTot[i]), pct(mC[i], mTot[i])]));
+  heatmap(D.rating_intent || []);
+}
+
+function heatmap(cells) {
+  const m = {}; cells.forEach(r => { (m[r.k1] ||= {})[r.k2] = r.value; });
+  const stars = ["1", "2", "3", "4", "5"].filter(s => m[s]);
+  const steps = ["--surface-2", "--seq-250", "--seq-350", "--seq-450", "--seq-550", "--seq-650"].map(css);
+  const html = [`<table><thead><tr><th>Stars</th>${INTENTS.map(i => `<th class="num">${i}</th>`).join("")}<th class="num">Reviews</th></tr></thead><tbody>`];
+  stars.forEach(s => { const row = m[s]; const n = Object.values(row).reduce((a, b) => a + b, 0);
+    html.push(`<tr><th>${"★".repeat(+s)}</th>${INTENTS.map(i => { const v = row[i] || 0, sh = n ? v / n : 0;
+      const idx = v ? Math.min(5, 1 + Math.floor(sh * 5)) : 0; const ink = idx >= 3 ? "#fff" : "var(--text-primary)";
+      return `<td class="num" title="${s}★ · ${i}: ${fmt(v)} (${pct(v, n)})" style="background:${steps[idx]};color:${ink};border:2px solid var(--surface-1);border-radius:4px">${fmt(v)}<br><span style="font-size:11px;opacity:.85">${pct(v, n)}</span></td>`; }).join("")}<td class="num">${fmt(n)}</td></tr>`); });
+  html.push("</tbody></table>");
+  $("#heatmap").innerHTML = html.join("");
+}
+
+function kpis(S) {
+  const c = S.counts, v = S.verification || {}, ctx = S.context || {};
+  const tiles = [
+    ["Reviews in scope", fmt(c.in_scope), `${fmt(c.source_rows)} source rows accounted`],
+    ["Classified", fmt(c.completed), `${pct(c.completed, c.in_scope)} of in-scope · ${fmt(c.quarantined_in_scope)} quarantined`],
+    ["Complaints + cancellation intent", fmt(c.complaint_or_cancellation), pct(c.complaint_or_cancellation, c.completed) + " of classified"],
+    ["Feature requests", fmt(ctx.requests), pct(ctx.requests, c.completed) + " of classified"],
+    ["Verifier agreement", v.compared ? `${(100 * v.topic_agreement).toFixed(0)}% / ${(100 * v.intent_agreement).toFixed(0)}%` : "—", `topic / intent on ${fmt(v.compared)} re-labelled reviews`],
+    ["API cost of this run", S.cost_usd_total != null ? "$" + Number(S.cost_usd_total).toFixed(4) : "—", "measured, all stages"],
+  ];
+  $("#kpis").innerHTML = tiles.map(([l, v, s]) => `<div class="card kpi"><div class="l">${esc(l)}</div><div class="v">${esc(v)}</div><div class="muted">${esc(s)}</div></div>`).join("");
+}
+
+function claimChip(id) { const c = STATE.claims[id]; return c
+  ? `<span class="chip claim" title="${esc(c.issue_id)} · ${esc(c.metric)}">${esc(id)}: ${esc(c.metric.replace("_", " "))} = ${esc(c.value)}</span>`
+  : `<span class="chip claim">${esc(id)}</span>`; }
+
+function recs(R) {
+  const prov = R.provenance || {};
+  if (!R.recommendations) {
+    $("#rec-prov").textContent = "";
+    $("#recs").innerHTML = `<div class="notice"><strong>Not generated yet for this run.</strong> The recommendation step is a bounded Claude Haiku call over the saved aggregates; it runs with <code>python -m pipeline.publish … --execute</code>. <span class="muted">(${esc(prov.pending || "")})</span></div>`;
+    return;
+  }
+  const r = R.recommendations, a = prov.audit || {};
+  const issues = Object.values(a).flat().length;
+  $("#rec-prov").innerHTML = `Generated by ${esc(prov.model)} (${esc(prov.prompt_version)}), request <code>${esc(prov.request_id)}</code>, from saved aggregates only. Code check: <span class="badge ${issues ? "warn" : "ok"}">${issues ? "⚠ " + issues + " ungrounded citation(s) removed" : "✓ all IDs and numbers grounded"}</span>`;
+  const top = `<div class="top"><div class="muted">Top priority area</div><div class="area">${esc(r.top_priority.area)}</div><p>${esc(r.top_priority.summary)}</p><div class="chips">${r.top_priority.claim_ids.map(claimChip).join("")}</div></div>`;
+  const actions = r.actions.map((x, i) => `<div class="card rec" style="margin-top:12px"><div class="head"><strong>${i + 1}. ${esc(x.title)}</strong><span class="badge">${esc(x.action_type)}</span></div>
+    <p style="margin:6px 0">${esc(x.recommendation)}</p><p class="sub" style="margin:0">${esc(x.rationale)}</p>
+    <div class="chips">${x.issue_ids.map(id => `<button class="chip" data-issue="${esc(id)}">${esc(id)}</button>`).join("")}${x.claim_ids.map(claimChip).join("")}${x.evidence_review_ids.map(id => `<button class="chip" data-review="${esc(id)}">review ${esc(id.slice(0, 8))}…</button>`).join("")}</div></div>`).join("");
+  const alts = `<div class="card" style="margin-top:12px"><h3>Alternatives considered</h3><ul style="margin:0;padding-left:18px">${r.alternatives.map(x => `<li><strong>${esc(x.option)}</strong> — ${esc(x.why_lower)}</li>`).join("")}</ul><h3 style="margin-top:10px">Stated limitations</h3><ul style="margin:0;padding-left:18px">${r.limitations.map(l => `<li>${esc(l)}</li>`).join("")}</ul></div>`;
+  $("#recs").innerHTML = top + actions + alts;
+}
+
+async function issues(kind) {
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.kind === kind));
+  const rows = await get(`/issues?kind=${kind}&limit=40`);
+  const max = Math.max(1, ...rows.map(r => kind === "complaint" ? r.priority_score : r.complaint_count));
+  const head = kind === "complaint"
+    ? `<tr><th class="num">Rank</th><th>Issue</th><th>Topic</th><th class="num">Complaints</th><th class="num">Mean severity</th><th>Priority score</th><th class="num">Cancellation intent</th></tr>`
+    : `<tr><th class="num">Rank</th><th>Request theme</th><th>Topic</th><th>Requests</th></tr>`;
+  const body = rows.map(r => {
+    const score = kind === "complaint" ? r.priority_score : r.complaint_count;
+    const barTd = `<td class="bar-cell"><div class="bc"><span class="bar" style="width:${(80 * score / max).toFixed(1)}px"></span><span class="lab">${fmt(score)}</span></div></td>`;
+    return `<tr class="clickable" tabindex="0" data-issue="${esc(r.issue_id)}"><td class="num">${r.rank}</td><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.issue_id)}</span></td><td>${esc(r.topic)}</td>` +
+      (kind === "complaint" ? `<td class="num">${fmt(r.complaint_count)}</td><td class="num">${esc(r.mean_severity)}</td>${barTd}<td class="num">${fmt(r.cancellation_count)}</td>` : barTd) + "</tr>";
+  }).join("");
+  $("#issues").innerHTML = `<thead>${head}</thead><tbody>${body || `<tr><td colspan="7" class="muted">No rows.</td></tr>`}</tbody>`;
+}
+
+async function openIssue(id) {
+  const d = await get(`/issues/${encodeURIComponent(id)}?limit=30`), i = d.issue;
+  $("#drawer-title").textContent = i.name;
+  $("#drawer-sub").innerHTML = `<code>${esc(i.issue_id)}</code> · ${esc(i.kind)} · topic ${esc(i.topic)}`;
+  const facts = i.kind === "complaint"
+    ? `<p>${fmt(i.complaint_count)} complaint/cancellation reviews · mean severity ${esc(i.mean_severity)} · priority score ${fmt(i.priority_score)} (rank ${i.rank})</p><div class="chips">${d.claims.map(c => claimChip(c.claim_id)).join("")}</div>`
+    : `<p>${fmt(i.complaint_count)} feature-request reviews (rank ${i.rank}).</p>`;
+  $("#drawer-body").innerHTML = `${i.description ? `<p class="sub">${esc(i.description)}</p>` : ""}${facts}
+    <h3 style="margin-top:14px">Member reviews <span class="muted">(showing ${d.members.length} of ${fmt(d.member_count)}, highest severity first)</span></h3>
+    <table><thead><tr><th>Review ID</th><th>Date</th><th class="num">★</th><th>Intent</th><th class="num">Sev.</th><th>Evidence quote</th></tr></thead><tbody>${d.members.map(m =>
+    `<tr class="clickable" tabindex="0" data-review="${esc(m.review_id)}"><td><code>${esc(m.review_id.slice(0, 8))}…</code>${m.cache_source_id ? ' <span class="badge" title="exact-text reuse of ' + esc(m.cache_source_id) + '">reused</span>' : ""}</td><td>${esc(m.review_date)}</td><td class="num">${m.rating ?? ""}</td><td>${esc(m.intent)}</td><td class="num">${m.severity}</td><td>${esc(m.evidence_quote)}</td></tr>`).join("")}</tbody></table>`;
+  const dlg = $("#drawer"); if (!dlg.open) dlg.showModal();
+}
+
+async function openReview(id) {
+  const r = await get(`/reviews/${encodeURIComponent(id)}`);
+  $("#drawer-title").textContent = "Review " + r.review_id;
+  $("#drawer-sub").innerHTML = `${esc(r.review_date)} · ${r.rating ?? "?"}★ · ${fmt(r.likes)} likes · app ${esc(r.app_version || "unknown")} · status ${esc(r.status)}`;
+  $("#drawer-body").innerHTML = r.status !== "completed" ? `<p>Not classified: ${esc(r.reason)}</p>` : `
+    <blockquote>${esc(r.review_text)}</blockquote>
+    <table><tbody>
+      <tr><th>Topic / intent</th><td>${esc(r.topic)} / ${esc(r.intent)}</td></tr>
+      <tr><th>Severity / sentiment</th><td>${r.severity} / ${Number(r.sentiment).toFixed(2)}</td></tr>
+      <tr><th>Evidence quote (exact substring)</th><td>“${esc(r.evidence_quote)}”</td></tr>
+      <tr><th>Needs review</th><td>${r.needs_review ? "yes (low model confidence)" : "no"}</td></tr>
+      <tr><th>Issue / request theme</th><td>${r.issue_id ? `<button class="chip" data-issue="${esc(r.issue_id)}">${esc(r.issue_id)}</button>` : "—"} ${r.theme_id ? `<button class="chip" data-issue="${esc(r.theme_id)}">${esc(r.theme_id)}</button>` : ""}</td></tr>
+      <tr><th>Provenance</th><td><code>${esc(r.label_config)}</code>${r.cache_source_id ? `<br>reused exact-text result of <button class="chip" data-review="${esc(r.cache_source_id)}">${esc(r.cache_source_id)}</button>` : ""}</td></tr>
+    </tbody></table>`;
+  const dlg = $("#drawer"); if (!dlg.open) dlg.showModal();
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-issue],[data-review],.tabs button");
+  if (!t) return;
+  if (t.matches(".tabs button")) return issues(t.dataset.kind);
+  if (t.dataset.issue) return openIssue(t.dataset.issue);
+  if (t.dataset.review) return openReview(t.dataset.review);
+});
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.matches("tr.clickable")) e.target.click(); });
+
+$("#search").onsubmit = async e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  if (f.get("id")) return openReview(f.get("id").trim());
+  const qs = new URLSearchParams([...f].filter(([k, v]) => v && k !== "id"));
+  const rows = await get("/reviews?" + qs);
+  $("#search-out").innerHTML = `<table><thead><tr><th>Review</th><th>Date</th><th class="num">★</th><th>Topic</th><th>Intent</th><th class="num">Sev.</th><th>Quote</th></tr></thead><tbody>${rows.map(r =>
+    `<tr class="clickable" tabindex="0" data-review="${esc(r.review_id)}"><td><code>${esc(r.review_id.slice(0, 8))}…</code></td><td>${esc(r.review_date)}</td><td class="num">${r.rating ?? ""}</td><td>${esc(r.topic)}</td><td>${esc(r.intent)}</td><td class="num">${r.severity}</td><td>${esc(r.evidence_quote)}</td></tr>`).join("") || `<tr><td colspan="7" class="muted">No matches.</td></tr>`}</tbody></table>`;
+};
+
+function method(S) {
+  const calls = S.calls || {};
+  $("#method").innerHTML = `<h3>How this was produced</h3>
+    <p class="sub" style="margin-top:0">Code ingests and deduplicates; <strong>Jev</strong> labels topic, intent, severity and sentiment (one review per request); <strong>Claude Haiku</strong> independently re-labels a sample, names issue groups and writes the recommendations from saved aggregates. Code validates every output, computes all counts and the ranking.</p>
+    <table><thead><tr><th>Stage</th><th class="num">Requests</th><th class="num">Failed</th><th class="num">Cost (USD)</th></tr></thead><tbody>${Object.entries(calls).map(([k, v]) =>
+    `<tr><td>${esc(k)}</td><td class="num">${fmt(v.requests)}</td><td class="num">${fmt(v.failed)}</td><td class="num">${Number(v.cost_usd).toFixed(6)}</td></tr>`).join("")}</tbody></table>
+    <p class="muted">Label config: <code>${esc((S.run.label_configs || [])[0])}</code><br>Input SHA-256: <code>${esc((S.run.input_sha256 || "").slice(0, 16))}…</code> · published ${esc(S.run.published_at)}</p>`;
+}
+
+(async function init() {
+  try {
+    const [S, D, C, R] = await Promise.all([get("/summary"), get("/distributions"), get("/claims"), get("/recommendations")]);
+    STATE = { summary: S, dist: D, claims: Object.fromEntries(C.map(c => [c.claim_id, c])) };
+    $("#run-label").textContent = S.run.label || "Run results";
+    $("#scope-badge").textContent = `${fmt(S.counts.completed)} classified · ${fmt(S.counts.source_rows)} rows`;
+    TOPICS.forEach(t => $("#search [name=topic]").insertAdjacentHTML("beforeend", `<option>${t}</option>`));
+    INTENTS.forEach(t => $("#search [name=intent]").insertAdjacentHTML("beforeend", `<option>${t}</option>`));
+    kpis(S); recs(R); drawCharts(); method(S); await issues("complaint");
+  } catch (err) {
+    document.querySelector(".wrap").insertAdjacentHTML("afterbegin", `<div class="notice">Could not load data from the backend: ${esc(err.message)}</div>`);
+  }
+})();
+</script>
+</body>
+</html>

@@ -15,6 +15,7 @@ Standard library only.
 """
 import argparse
 import csv
+import gzip
 import json
 import sys
 from collections import defaultdict
@@ -39,8 +40,17 @@ def load_rates(path, multiplier=1.0):
 
 
 def load_jsonl(path):
-    with open(path, encoding="utf-8") as f:
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8") as f:
         return [json.loads(l) for l in f if l.strip()]
+
+
+def find(d, name):
+    """`name` or its gzipped form (large runs are stored gzipped). Returns None if neither exists."""
+    for cand in (d / name, d / (name + ".gz")):
+        if cand.exists():
+            return cand
+    return None
 
 
 def usage_rows(calls):
@@ -283,7 +293,7 @@ def render(rep):
           f"electricity: {lc['electricity_usd_per_kwh'] or 'unknown'} $/kWh → local cost: "
           f"{fmt(lc['estimated_usd'], 4)}.", "",
           "Formulas: item_cost = billed_units × price_usd / per_units; total = Σ item_cost. "
-          "Sources: `pilot_calls.jsonl`, `pilot_runs.json`, `rates.csv`, `assumptions.json`; derived `usage.csv`."]
+          "Sources: `pilot_calls.jsonl[.gz]`, `pilot_runs.json`, `rates.csv`, `assumptions.json`; derived `usage.csv[.gz]`."]
     return "\n".join(L) + "\n"
 
 
@@ -301,8 +311,9 @@ def main(argv=None):
     rates = load_rates(args.rates or d / "rates.csv", args.rate_multiplier)
     assumptions = json.loads((args.assumptions or d / "assumptions.json").read_text(encoding="utf-8"))
     budget = args.budget if args.budget is not None else assumptions["budget_usd"]
-    calls_path, runs_path = d / "pilot_calls.jsonl", d / "pilot_runs.json"
-    calls = load_jsonl(calls_path) if calls_path.exists() else []
+    calls_path, runs_path = find(d, "pilot_calls.jsonl"), d / "pilot_runs.json"
+    calls = load_jsonl(calls_path) if calls_path else []
+    gz = bool(calls_path) and str(calls_path).endswith(".gz")
     runs = json.loads(runs_path.read_text(encoding="utf-8")) if runs_path.exists() else []
 
     priced = price_rows(usage_rows(calls), rates)
@@ -316,7 +327,10 @@ def main(argv=None):
            "local_compute": lc}
 
     out.mkdir(parents=True, exist_ok=True)
-    with open(out / "usage.csv", "w", encoding="utf-8", newline="") as f:
+    usage_path = out / ("usage.csv.gz" if gz else "usage.csv")
+    (out / ("usage.csv" if gz else "usage.csv.gz")).unlink(missing_ok=True)   # never leave both forms
+    with (gzip.open(usage_path, "wt", encoding="utf-8", newline="") if gz
+          else open(usage_path, "w", encoding="utf-8", newline="")) as f:
         cols = ["run_id", "run_kind", "role", "request_id", "outcome", "provider", "model", "tier", "item",
                 "billed_units", "unit_price_usd", "item_cost_usd", "rate_source", "rate_checked"]
         w = csv.DictWriter(f, fieldnames=cols, lineterminator="\n")

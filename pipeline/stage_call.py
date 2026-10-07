@@ -19,9 +19,14 @@ def cache_key(role, model, prompt_version, payload) -> tuple[str, str]:
     return hashlib.sha256(f"{role}|{model}|{prompt_version}|{input_sha}".encode()).hexdigest(), input_sha
 
 
+class NotCached(LookupError):
+    """Raised when allow_call=False and no saved artifact matches these exact inputs."""
+
+
 def cached_json_call(con, *, role, run_id, ledger, model, prompt_version, system, payload, schema, max_tokens,
-                     review_ids=(), est_cost=0.05):
-    """Returns (output_dict, request_id, cached: bool). Raises RuntimeError on a failed call (logged)."""
+                     review_ids=(), est_cost=0.05, allow_call=True):
+    """Returns (output_dict, request_id, cached: bool). Raises RuntimeError on a failed call (logged).
+    With allow_call=False it never touches the network: a cache miss raises NotCached."""
     import anthropic
 
     from .backends.claude import cost_of
@@ -30,6 +35,8 @@ def cached_json_call(con, *, role, run_id, ledger, model, prompt_version, system
     hit = con.execute("SELECT output, request_id FROM artifacts WHERE cache_key=?", (key,)).fetchone()
     if hit:
         return json.loads(hit["output"]), hit["request_id"], True
+    if not allow_call:
+        raise NotCached(f"{role}/{prompt_version}: no saved output for these inputs")
     client = anthropic.Anthropic(api_key=require("ANTHROPIC_API_KEY"), max_retries=0, timeout=180.0)
     res = ledger.reserve(est_cost)
     started, t = now(), time.perf_counter()

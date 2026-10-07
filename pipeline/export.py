@@ -85,7 +85,8 @@ def export_grading(con, out_dir, label_configs, claims=None, allow_multi_issue=F
         "analysis_sha256": get_meta(con, "input_sha256"),
         "classification_input_fields": ["review_text"], "allow_multi_issue": allow_multi_issue})
     write_jsonl(out_dir / "records.jsonl.gz", records, gz=True)
-    write_jsonl(out_dir / "calls.jsonl", calls_rows(con))
+    (out_dir / "calls.jsonl").unlink(missing_ok=True)       # checker flags a plain + .gz pair as ambiguous
+    write_jsonl(out_dir / "calls.jsonl.gz", calls_rows(con), gz=True)
 
     severity = {r["review_id"]: r["severity"] for r in records if r["status"] == "completed"}
     pairs = membership_rows(con)

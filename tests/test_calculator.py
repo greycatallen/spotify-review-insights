@@ -113,3 +113,15 @@ def test_no_pilot_yet_is_reported_not_invented(tmp_path):
     rep = _run(d)
     assert rep["measured"] == {} and rep["projection"] == {}
     assert "No measured pilot found" in (d / "out" / "report.md").read_text()
+
+
+def test_gzipped_inputs_give_identical_results(tmp_path):
+    import gzip
+    d = _fixture(tmp_path)
+    plain = _run(d)
+    raw = (d / "pilot_calls.jsonl").read_bytes()
+    (d / "pilot_calls.jsonl").unlink()
+    (d / "pilot_calls.jsonl.gz").write_bytes(gzip.compress(raw))
+    zipped = _run(d)
+    assert plain["measured"] == zipped["measured"] and plain["projection"] == zipped["projection"]
+    assert (d / "out" / "usage.csv.gz").exists() and not (d / "out" / "usage.csv").exists()
