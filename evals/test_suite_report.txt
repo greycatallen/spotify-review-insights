@@ -1,0 +1,45 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- ./.venv/bin/python
+cachedir: .pytest_cache
+rootdir: .
+plugins: anyio-4.15.1
+collecting ... collected 36 items
+
+tests/test_calculator.py::test_cold_cost_is_recomputable_by_hand PASSED  [  2%]
+tests/test_calculator.py::test_doubling_rates_doubles_api_only PASSED    [  5%]
+tests/test_calculator.py::test_projected_count_does_not_change_measured PASSED [  8%]
+tests/test_calculator.py::test_unknown_price_is_not_zero PASSED          [ 11%]
+tests/test_calculator.py::test_budget_warning PASSED                     [ 13%]
+tests/test_calculator.py::test_no_pilot_yet_is_reported_not_invented PASSED [ 16%]
+tests/test_calculator.py::test_gzipped_inputs_give_identical_results PASSED [ 19%]
+tests/test_group_memo.py::test_facets PASSED                             [ 22%]
+tests/test_group_memo.py::test_every_complaint_in_exactly_one_issue PASSED [ 25%]
+tests/test_group_memo.py::test_memo_audit_flags_unknown_claims_and_numbers PASSED [ 27%]
+tests/test_ledger.py::test_reserve_settle_release PASSED                 [ 30%]
+tests/test_ledger.py::test_unknown_price_or_outcome_keeps_reservation_counted PASSED [ 33%]
+tests/test_ledger.py::test_crash_leftover_reservations_become_unreconciled PASSED [ 36%]
+tests/test_ledger.py::test_concurrent_workers_never_exceed_cap PASSED    [ 38%]
+tests/test_ledger.py::test_rate_limiter_waits_when_bucket_empty PASSED   [ 41%]
+tests/test_ledger.py::test_backoff_is_bounded_and_jittered PASSED        [ 44%]
+tests/test_pipeline_e2e.py::test_full_flow_passes_course_checker PASSED  [ 47%]
+tests/test_pipeline_e2e.py::test_invalid_outputs_are_retried_then_left_pending PASSED [ 50%]
+tests/test_pipeline_e2e.py::test_circuit_breaker_and_failed_calls_logged PASSED [ 52%]
+tests/test_pipeline_e2e.py::test_two_workers_same_results_as_one PASSED  [ 55%]
+tests/test_pipeline_e2e.py::test_budget_stops_admission PASSED           [ 58%]
+tests/test_pipeline_e2e.py::test_scoped_run_accounts_all_ids_and_passes_checker PASSED [ 61%]
+tests/test_ranking.py::test_half_up_not_bankers PASSED                   [ 63%]
+tests/test_ranking.py::test_order_score_desc_then_issue_id_asc PASSED    [ 66%]
+tests/test_ranking.py::test_matches_checker_on_random_data PASSED        [ 69%]
+tests/test_ranking.py::test_duplicate_membership_and_bad_severity_rejected PASSED [ 72%]
+tests/test_ranking.py::test_claims_read_from_ranking PASSED              [ 75%]
+tests/test_schema_and_injection.py::test_valid_record_passes PASSED      [ 77%]
+tests/test_schema_and_injection.py::test_each_planted_error_is_caught PASSED [ 80%]
+tests/test_schema_and_injection.py::test_quote_must_be_exact_substring_no_normalisation PASSED [ 83%]
+tests/test_schema_and_injection.py::test_batch_rejects_unknown_duplicate_and_missing_ids PASSED [ 86%]
+tests/test_schema_and_injection.py::test_non_list_response_rejects_everything PASSED [ 88%]
+tests/test_schema_and_injection.py::test_rubric_warnings PASSED          [ 91%]
+tests/test_secrets.py::test_env_is_git_ignored PASSED                    [ 94%]
+tests/test_secrets.py::test_env_example_is_blank PASSED                  [ 97%]
+tests/test_secrets.py::test_no_key_shaped_strings_in_artifacts PASSED    [100%]
+
+============================== 36 passed in 0.37s ==============================

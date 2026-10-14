@@ -90,7 +90,7 @@ def _bump_failures(con, text_shas, label_config, reason):
 def run_enrichment(con, backend: Backend, *, run_id, phase, ledger, limiter, batch_size=50, workers=1,
                    max_batches=None, max_attempts=3, done_configs=None, fallback_from=None,
                    fallback_cap=None, stop_event=None, log=print, sleep=time.sleep, db_lock=None,
-                   max_consecutive_failures=5):
+                   max_consecutive_failures=5, prefetch=2000):
     """Run until no pending work, the budget/batch limit is hit, or stop_event is set.
 
     fallback_from: label_config of the primary route; when set, only texts that exhausted
@@ -180,6 +180,7 @@ def run_enrichment(con, backend: Backend, *, run_id, phase, ledger, limiter, bat
             in_flight.difference_update(sent)
 
     route_config = fallback_from or backend.label_config
+    page = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
         capped = False
         while True:
@@ -187,16 +188,20 @@ def run_enrichment(con, backend: Backend, *, run_id, phase, ledger, limiter, bat
             # at the end of a pass the cursor wraps to -1 so earlier failures get bounded retries.
             while (not capped and not stop_event.is_set() and len(futures) < workers
                    and (max_batches is None or admitted_batches < max_batches)):
-                with db_lock:
-                    rows = pending_after(con, done_configs, cursor, batch_size * (workers + 4), max_attempts,
-                                         route_config, only_failed=bool(fallback_from))
-                rows = [r for r in rows if r["canonical_id"] not in in_flight]
-                if not rows:
-                    if cursor != -1:
-                        cursor = -1
-                        continue
-                    break  # nothing admittable right now (done, or everything left is in flight)
-                batch = rows[:batch_size]
+                if not page:
+                    # Prefetch a page of pending texts: one queue query per page, not per request
+                    # (with 1-review Jev requests a per-request query dominated runtime on the 660k-row DB).
+                    with db_lock:
+                        page = pending_after(con, done_configs, cursor, max(prefetch, batch_size * (workers + 4)),
+                                             max_attempts, route_config, only_failed=bool(fallback_from))
+                    page = [r for r in page if r["canonical_id"] not in in_flight]
+                    if not page:
+                        if cursor != -1:
+                            cursor = -1
+                            continue
+                        break  # nothing admittable right now (done, or everything left is in flight)
+                    cursor = page[-1]["src_order"]
+                batch, page = page[:batch_size], page[batch_size:]
                 if fallback_from and fallback_cap is not None:
                     room = fallback_cap - fallback_used
                     if room <= 0:
@@ -205,7 +210,6 @@ def run_enrichment(con, backend: Backend, *, run_id, phase, ledger, limiter, bat
                         break
                     batch = batch[:room]
                     fallback_used += len(batch)
-                cursor = batch[-1]["src_order"]
                 items = [{"review_id": r["canonical_id"], "text": r["review_text"], "text_sha256": r["text_sha256"]}
                          for r in batch]
                 attempt = 1 + max(r["attempts"] for r in batch)

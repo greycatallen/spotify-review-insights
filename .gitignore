@@ -17,3 +17,10 @@ __pycache__/
 Final Assignment - Spotify Reviews Dataset/spotify_reviews_18months.csv
 .venv/
 .claude/settings.local.json
+Screenshot and recording/
+.vercel/
+.vercel
+.env*
+.agents/
+.claude/skills/
+skills-lock.json

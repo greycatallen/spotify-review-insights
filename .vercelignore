@@ -1,0 +1,20 @@
+# Deploy only the read-only backend (api/), the static dashboard (dashboard/), requirements.txt and vercel.json.
+.venv
+.env*
+.agents
+.claude
+state
+Final Assignment - Spotify Reviews Dataset
+Screenshot and recording
+pipeline
+tests
+cost
+grading
+golden
+evals
+docs
+*.md
+*.sqlite
+requirements-pipeline.txt
+local-reference.json
+self-check.json

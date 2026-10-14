@@ -40,5 +40,12 @@
     "device": "Apple Mac laptop",
     "average_power_watts": null,
     "electricity_usd_per_kwh": null
+  },
+  "scoped_run": {
+    "_comment": "Declared final scope: seeded random 100,000 nonempty reviews (golden 50 excluded); distinct-text count measured by `python -m pipeline.final prepare`.",
+    "input_rows": 100000,
+    "nonempty_texts": 100000,
+    "empty_text_quarantines": 0,
+    "distinct_nonempty_texts": 77944
   }
 }

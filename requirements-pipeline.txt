@@ -1,0 +1,6 @@
+# Pipeline, tests and local dashboard (install both files): pip install -r requirements.txt -r requirements-pipeline.txt
+anthropic==1.11.0
+pytest==9.1.1
+python-dotenv==1.2.4
+typesafe-sdk==0.7.2
+uvicorn==0.54.0

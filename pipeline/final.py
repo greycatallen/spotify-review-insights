@@ -89,7 +89,7 @@ def cmd_enrich(a):
               flush=True)
         stop.set()
     signal.signal(signal.SIGINT, on_sigint)
-    jev = JevBackend()
+    jev = JevBackend(timeout=10.0)
     run_id = f"final-{a.phase}-" + now().replace(":", "")
     ledger = SpendLedger(con, JEV_CAP, run_id, scope="typesafe")
     total = con.execute("SELECT count(*) FROM texts").fetchone()[0]
@@ -107,7 +107,9 @@ def cmd_enrich(a):
           f"Jev cap ${JEV_CAP:.2f}. Ctrl+C once to stop cleanly.", flush=True)
     stats = run_enrichment(con, jev, run_id=run_id, phase=a.phase, ledger=ledger,
                            limiter=RateLimiter(a.rpm, 6_000_000), batch_size=1, workers=a.workers,
-                           max_attempts=MAX_ATTEMPTS, done_configs=[PRIMARY, FALLBACK], stop_event=stop, log=log)
+                           max_attempts=MAX_ATTEMPTS, done_configs=[PRIMARY, FALLBACK], stop_event=stop, log=log,
+                           # all in-flight calls can time out together in one provider stall
+                           max_consecutive_failures=3 * a.workers)
     after = con.execute("SELECT count(*) FROM results").fetchone()[0]
     print(json.dumps({"phase": a.phase, "stopped_reason": stats.stopped_reason, "new_completed_texts": after - before,
                       "completed_texts": after, "of": total, "failed_batches": stats.batches_failed,

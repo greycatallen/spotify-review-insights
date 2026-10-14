@@ -170,9 +170,9 @@ def measured(priced, calls, runs):
     return by_kind
 
 
-def project(cold, assumptions, rates, budget, rate_multiplier):
+def project(cold, assumptions, rates, budget, rate_multiplier, run_key="full_run"):
     """Full-run scenarios extrapolated stage by stage from the cold pilot. Pure arithmetic."""
-    full = assumptions["full_run"]
+    full = assumptions[run_key]
     st = cold["stages"]
     enrich_texts = max(cold["unique_texts"] or 0, 1)
 
@@ -283,6 +283,15 @@ def render(rep):
         warn = "⚠️ OVER" if s["over_budget"] else "ok"
         L.append(f"| {name} | {s['work_texts']:,} | {fmt(c['enrich'],2)} | {fmt(c['fallback'],2)} | {fmt(c['verify'],2)} | "
                  f"{fmt(c['group_memo'],2)} | **{fmt(s['api_total']['usd'],2)}** | {s['elapsed_hours_modeled']} | {warn} |")
+    if rep.get("projection_scoped_run"):
+        L += ["", "## Declared final scope: seeded 100,000 reviews (77,944 distinct texts)", "",
+              "| Scenario | Texts sent | Enrich | Fallback | Verify | Group+memo | **API total** | Modeled hours | Budget |",
+              "|---|---|---|---|---|---|---|---|---|"]
+        for name, s in rep["projection_scoped_run"].items():
+            c = s["cost_by_stage_usd"]
+            L.append(f"| {name} | {s['work_texts']:,} | {fmt(c['enrich'],2)} | {fmt(c['fallback'],2)} | {fmt(c['verify'],2)} | "
+                     f"{fmt(c['group_memo'],2)} | **{fmt(s['api_total']['usd'],2)}** | {s['elapsed_hours_modeled']} | "
+                     f"{'⚠️ OVER' if s['over_budget'] else 'ok'} |")
     if any(s["over_budget"] for s in rep["projection"].values()):
         L += ["", f"> **Warning:** at least one scenario exceeds the ${rep['budget_usd']:.2f} budget."]
     if any(s["api_total"]["unknown_items"] for s in rep["projection"].values()):
@@ -319,11 +328,14 @@ def main(argv=None):
     priced = price_rows(usage_rows(calls), rates)
     meas = measured(priced, calls, runs) if runs else {}
     proj = project(meas["cold"], assumptions, rates, budget, args.rate_multiplier) if "cold" in meas else {}
+    proj_scoped = (project(meas["cold"], assumptions, rates, budget, args.rate_multiplier, "scoped_run")
+                   if "cold" in meas and "scoped_run" in assumptions else {})
     lc = dict(assumptions["local_compute"])
     hrs = (meas.get("cold", {}).get("wall_seconds") or 0) / 3600
     lc["estimated_usd"] = (lc["average_power_watts"] / 1000 * hrs * lc["electricity_usd_per_kwh"]
                            if lc.get("average_power_watts") and lc.get("electricity_usd_per_kwh") and hrs else None)
     rep = {"rate_multiplier": args.rate_multiplier, "budget_usd": budget, "measured": meas, "projection": proj,
+           "projection_scoped_run": proj_scoped,
            "local_compute": lc}
 
     out.mkdir(parents=True, exist_ok=True)

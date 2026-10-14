@@ -64,6 +64,29 @@ def cmd_check(a):
     return 0 if report["status"] == "pass" else 1
 
 
+def cmd_rank(a):
+    """Recompute the baseline ranking from saved grading/ files only (no state DB, no model calls) and
+    compare it byte-for-byte with the saved ranking.csv."""
+    import csv as _csv
+    import gzip
+    from .rank import RANKING_HEADER, compute_ranking, ranking_table
+    folder = a.grading
+    path = folder / "records.jsonl.gz"
+    with (gzip.open(path, "rt", encoding="utf-8") if path.exists() else open(folder / "records.jsonl", encoding="utf-8")) as f:
+        sev = {r["review_id"]: r["severity"] for r in map(json.loads, f) if r["status"] == "completed"}
+    with open(folder / "membership.csv", encoding="utf-8", newline="") as f:
+        pairs = [(r["issue_id"], r["review_id"]) for r in _csv.DictReader(f)]
+    rows = [list(RANKING_HEADER)] + ranking_table(compute_ranking((i, r, sev[r]) for i, r in pairs))
+    with open(folder / "ranking.csv", encoding="utf-8", newline="") as f:
+        saved = list(_csv.reader(f))
+    out = a.out or (ROOT / "ranking_recomputed.csv")
+    with open(out, "w", encoding="utf-8", newline="") as f:
+        _csv.writer(f, lineterminator="\n").writerows(rows)
+    print(f"{len(rows) - 1} issues recomputed from {len(pairs):,} memberships -> {out}")
+    print("identical to saved ranking.csv:", rows == saved)
+    return 0 if rows == saved else 1
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="pipeline", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -81,6 +104,9 @@ def main(argv=None):
     s.add_argument("--reference", type=Path, default=ROOT / "local-reference.json")
     s.add_argument("--gold", type=Path); s.add_argument("--out", type=Path, default=ROOT / "self-check.json")
     s.set_defaults(fn=cmd_check)
+    s = sub.add_parser("rank", help="recompute ranking from grading/ files only (no model calls)")
+    s.add_argument("--grading", type=Path, default=ROOT / "grading"); s.add_argument("--out", type=Path)
+    s.set_defaults(fn=cmd_rank)
     a = p.parse_args(argv)
     return a.fn(a) or 0
 
