@@ -1,0 +1,24 @@
+{
+  "all_verified": {
+    "intent": 0.6972,
+    "n": 1199,
+    "severity_exact": 0.7356,
+    "severity_within_1": 0.9566,
+    "topic": 0.6564
+  },
+  "needs_review_only": {
+    "intent": 0.6159,
+    "n": 820,
+    "severity_exact": 0.7,
+    "severity_within_1": 0.9488,
+    "topic": 0.5744
+  },
+  "random_1pct": {
+    "intent": 0.8734,
+    "n": 379,
+    "severity_exact": 0.8127,
+    "severity_within_1": 0.9736,
+    "topic": 0.8338
+  },
+  "sampling": "Seeded 1% random sample of distinct texts plus every needs_review text (low Jev confidence), capped at 1,200 in review-ID order; verifier saw only the review text and rubric."
+}

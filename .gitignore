@@ -24,3 +24,4 @@ Screenshot and recording/
 .agents/
 .claude/skills/
 skills-lock.json
+ranking_recomputed.csv

@@ -14,7 +14,7 @@ from collections import Counter
 from sqlalchemy import (JSON, Boolean, Column, Float, Integer, MetaData, String, Table, Text, create_engine,
                         insert)
 
-from .config import COMPLAINT_INTENTS
+from .config import COMPLAINT_INTENTS, ROOT
 from .db import connect
 from .export import iter_records
 from .group import name_request_themes, request_themes
@@ -51,7 +51,7 @@ T_AGG = Table("aggregates", meta, Column("id", Integer, primary_key=True, autoin
               Column("value", Integer))
 
 
-def build(con, label_configs, *, allow_call=False, run_label="", log=print):
+def build(con, label_configs, *, allow_call=False, run_label="", log=print, ledger=None):
     records = list(iter_records(con, label_configs))
     src = {r["review_id"]: dict(r) for r in con.execute(
         "SELECT review_id, review_text, review_rating, review_likes, app_version, review_timestamp, src_order "
@@ -69,7 +69,8 @@ def build(con, label_configs, *, allow_call=False, run_label="", log=print):
     claims = build_claims(ranking, top_n=8)
     themes = request_themes(con, label_configs)
     theme_of = {rid: t for t, ids in themes.items() for rid in ids}
-    ledger = SpendLedger(con, 1.0, f"publish-{now()}")
+    # Claude-only ledger: AI calls here are Haiku; other providers' spend must not count against this cap.
+    ledger = ledger or SpendLedger(con, 1.0, f"publish-{now()}", scope="anthropic")
     try:
         theme_names, theme_info = name_request_themes(con, themes, label_configs, run_id=ledger.run_id, ledger=ledger,
                                                       allow_call=allow_call)
@@ -158,6 +159,9 @@ def build(con, label_configs, *, allow_call=False, run_label="", log=print):
         "context": context,
     }
     summary["cost_usd_total"] = round(sum(v["cost_usd"] for v in summary["calls"].values()), 6)
+    split = ROOT / "evals" / "verification" / "verification_summary.json"
+    if split.exists():   # random-sample vs low-confidence agreement (pipeline.verify_report)
+        summary["verification"]["split"] = {k: v for k, v in json.loads(split.read_text()).items() if k != "sampling"}
     return {"summary": summary, "reviews": review_rows, "issues": issue_rows, "claims": claims,
             "recommendations": rec.get("output"), "aggregates": agg, "pack": pack}
 

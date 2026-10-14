@@ -185,7 +185,8 @@ def cmd_finish(a):
     summary = export_grading(con, GRADING_DIR, cfg, claims=m["claims"])
     stage["export"] = {"seconds": round(time.perf_counter() - t, 1), **summary}
     t = time.perf_counter()
-    data = build(con, cfg, allow_call=True, run_label="Final run: seeded random 100,000 reviews (golden 50 excluded)")
+    data = build(con, cfg, allow_call=True, run_label="Final run: seeded random 100,000 reviews (golden 50 excluded)",
+                 ledger=claude)
     write_db(f"sqlite:///{STATE_DIR / 'dashboard_final.sqlite'}", data)
     stage["recommend"] = {"seconds": round(time.perf_counter() - t, 1), **data["summary"]["ai"]}
     write_json(ROOT / "run_summary.json", {"finished_at": now(), "scope": json.loads(get_meta(con, "scope")),

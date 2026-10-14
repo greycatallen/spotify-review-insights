@@ -1,0 +1,103 @@
+{
+  "claude_committed_usd": 0.6444,
+  "finished_at": "2026-10-14T18:42:45.490+00:00",
+  "scope": {
+    "ids_sha256": "bbaefebbfe07826855a2934ce200a6a5cee7fcef566a72d3bddd0d24d4b00ccb",
+    "method": "lowest SHA-256(seed:review_id) among nonempty reviews, golden 50 excluded",
+    "n": 100000,
+    "seed": "a5-final-100k-v1"
+  },
+  "stages": {
+    "export": {
+      "cache_reuses": 22056,
+      "completed": 100000,
+      "issues": 45,
+      "memberships": 46317,
+      "quarantined": 560622,
+      "records": 660622,
+      "seconds": 10.4
+    },
+    "fallback": {
+      "batches_failed": 0,
+      "batches_ok": 0,
+      "records_rejected": 0,
+      "records_saved": 0,
+      "seconds": 1.1,
+      "stopped_reason": "completed",
+      "wall_seconds": 0.154
+    },
+    "group": {
+      "cached": true,
+      "evidence_reviews_sent": 225,
+      "issues": 45,
+      "missing_names": [],
+      "named": 45,
+      "request_id": "req_011Cg2cjzCVsVt445eeFewxP",
+      "seconds": 7.9,
+      "unknown_ids_returned": []
+    },
+    "memo": {
+      "attempts": 1,
+      "audit": {
+        "claims_cited": [
+          "C1",
+          "C2",
+          "C4",
+          "C5",
+          "C7",
+          "C8",
+          "C10",
+          "C11",
+          "C13",
+          "C14",
+          "C16",
+          "C17",
+          "C19",
+          "C22",
+          "C23"
+        ],
+        "unexplained_numbers": [],
+        "unknown_claim_ids": []
+      },
+      "seconds": 7.3
+    },
+    "recommend": {
+      "recommendations": {
+        "attempts": 1,
+        "audit": {
+          "unexplained_numbers": [],
+          "unknown_claim_ids": [],
+          "unknown_issue_ids": [],
+          "unknown_review_ids": []
+        },
+        "cached": false,
+        "model": "claude-haiku-4-5",
+        "prompt_version": "recommend-v2",
+        "request_id": "req_011Cg2cwSWqYoKHWFSGqYntT"
+      },
+      "request_themes": {
+        "cached": false,
+        "named": 40,
+        "request_id": "req_011Cg2cusTEM8kjj2DocRofc",
+        "themes": 40
+      },
+      "seconds": 88.5
+    },
+    "verify": {
+      "agree_intent": 19,
+      "agree_severity": 22,
+      "agree_topic": 20,
+      "cached": 1169,
+      "compared": 30,
+      "seconds": 25.4,
+      "sent": 31
+    }
+  },
+  "verification": {
+    "compared": 1199,
+    "disagreements": 50,
+    "intent_agreement": 0.6972,
+    "severity_agreement": 0.7356,
+    "topic_agreement": 0.6564
+  }
+}

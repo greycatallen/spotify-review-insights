@@ -181,6 +181,8 @@ dialog .db { padding: 14px 18px; }
           <li>No revenue, plan tier or confirmed cancellations: cancellation language is stated intent, not churn.</li>
           <li>Labels are model predictions (Jev) with an independent Haiku check on a sample; see agreement above.</li>
           <li>Issue grouping is deterministic (topic + matched feature term); names are AI-suggested.</li>
+          <li>The AI recommendations above are shown as generated (code-checked IDs and numbers). The author's reviewed decision memo, with wording corrections, is <a href="https://github.com/greycatallen/spotify-review-insights/blob/master/memo.md">memo.md</a>.</li>
+          <li>Source code, evidence and grading export: <a href="https://github.com/greycatallen/spotify-review-insights">GitHub repository</a>.</li>
         </ul>
       </div>
     </div>
@@ -295,7 +297,10 @@ function kpis(S) {
     ["Classified", fmt(c.completed), `${pct(c.completed, c.in_scope)} of in-scope · ${fmt(c.quarantined_in_scope)} quarantined`],
     ["Complaints + cancellation intent", fmt(c.complaint_or_cancellation), pct(c.complaint_or_cancellation, c.completed) + " of classified"],
     ["Feature requests", fmt(ctx.requests), pct(ctx.requests, c.completed) + " of classified"],
-    ["Verifier agreement", v.compared ? `${(100 * v.topic_agreement).toFixed(0)}% / ${(100 * v.intent_agreement).toFixed(0)}%` : "—", `topic / intent on ${fmt(v.compared)} re-labelled reviews`],
+    (v.split && v.split.random_1pct)
+      ? ["Verifier agreement (random 1%)", `${(100 * v.split.random_1pct.topic).toFixed(0)}% / ${(100 * v.split.random_1pct.intent).toFixed(0)}%`,
+         `topic / intent on ${fmt(v.split.random_1pct.n)} random reviews · ${(100 * v.split.needs_review_only.topic).toFixed(0)}% / ${(100 * v.split.needs_review_only.intent).toFixed(0)}% on ${fmt(v.split.needs_review_only.n)} low-confidence cases`]
+      : ["Verifier agreement", v.compared ? `${(100 * v.topic_agreement).toFixed(0)}% / ${(100 * v.intent_agreement).toFixed(0)}%` : "—", `topic / intent on ${fmt(v.compared)} re-labelled reviews`],
     ["API cost of this run", S.cost_usd_total != null ? "$" + Number(S.cost_usd_total).toFixed(4) : "—", "measured, all stages"],
   ];
   $("#kpis").innerHTML = tiles.map(([l, v, s]) => `<div class="card kpi"><div class="l">${esc(l)}</div><div class="v">${esc(v)}</div><div class="muted">${esc(s)}</div></div>`).join("");

@@ -21,7 +21,44 @@ it never calls a model. API docs: https://spotify-review-insights-nine.vercel.ap
 > `unfinished_classification` by design. Deviation from the brief: the golden 50 texts are **not**
 > in the final run (they were run separately for evaluation, `evals/golden/`).
 
-RESULTS_PLACEHOLDER
+## Results (final run, 2026-10-14)
+
+| | |
+|---|---|
+| Source rows ingested and profiled | **660,622** (`grading/ingestion.json`, provided helper; matches manifest) |
+| Records exported | **660,622**: 100,000 completed, 13 `empty_review_text`, 560,609 `not_in_scope` (0 missing / duplicate / invalid) |
+| Classified in scope | **100,000 / 100,000** (77,944 distinct texts; **22,056** exact-text reuses with direct `cache_source_id`) |
+| Enrichment calls | 77,944 succeeded + 79 failed (timeouts, all retried successfully); 0 invalid outputs; fallback not needed |
+| Golden 50 (separate run) | topic **88%**, intent **92%**, severity exact **86%** (MAE 0.14), sentiment within 0.5 **90%**, quotes 50/50 exact — [report](evals/golden/report.md) |
+| Independent verification | 1,199 reviews re-labelled blind by Haiku. Random 1%: topic **83%**, intent **87%**, severity exact 81%; low-confidence (`needs_review`) cases: 57% / 62% — [summary](evals/verification/verification_summary.json), [disagreements](evals/verification/disagreements.csv) |
+| Planted errors / injection | 20/20 planted wrong labels flagged by the verifier comparison; 6/6 malformed records rejected; injected instruction ignored — [planted](evals/planted/planted_results.json) |
+| Cost (measured) | Final run **$3.3309** (Jev enrich $2.7046 + Claude verify/group/memo/recommend $0.6263); whole project incl. pilots, dev runs and golden eval ≈ $3.5 |
+| Time (measured) | Enrichment 33.9 min wall clock (6 workers, ~38–60 reviews/s); finish stage ~25 min (verification dominated) |
+| Interrupt/resume | initial phase stopped by Ctrl+C after 586 texts (`checkpoint_before.json`: 10,745 review IDs incl. reuses); resume completed the rest with **no** resent IDs (`checkpoint_after.json`: 100,000) |
+| Course checker | `status: review_required` with exactly two expected flags: `unfinished_classification` (out-of-scope rows, by design) and `invalid_usage` ×152 (timed-out calls whose token usage is genuinely unknown, kept as `null`). Coverage, ranking, claims, cache reuse, roles and resume all pass. The checker's golden score is 0/50 because the golden texts are excluded from the final run by design — see the separate golden evaluation above. |
+
+**Decision:** prioritize playback reliability, then free-tier ad load, then premium paywall
+boundaries — see [memo.md](memo.md) (human-reviewed; AI drafts kept in `evals/memo/`).
+
+### One review traced end to end
+
+1. **Source:** `019a9dfc-8d1f-4f30-90c6-a9920a5599e6` — "It wouldn't even let me play the song I wanted"
+   (row hash `5232b777…f0cd`), in the seeded 100k scope.
+2. **Enrich:** Jev request `req_01a13b9894ec797080fad16122ee96e0` (phase `resume`) → playback /
+   complaint / severity 4; quote = full text (exact substring), `label_config`
+   `jev-1.13.0+jevq-v2+a5-common-v1`.
+3. **Verify:** Haiku request `req_011Cg2bXSNNiyKTvjVaFLPnf`, without seeing Jev's answer →
+   playback / complaint / 4 (agrees).
+4. **Group:** code assigns it to `playback.general` (`grading/membership.csv`).
+5. **Rank:** `playback.general` is rank 4, 3145 complaints, mean severity 3.386010, priority 10649
+   (`grading/ranking.csv`).
+6. **Memo:** cited as claims C10–C12 in [memo.md](memo.md) and on the dashboard.
+
+**An ambiguous case:** golden review `5de7f95b…` ("We are boycotting Swedish app in our protest…"):
+human label other/complaint/2, Jev other/cancellation/2. The contract says bare boycott slogans are
+`unclear` unless a personal departure is stated; "we are boycotting" was read as a departure by Jev
+and as a complaint by the labeller. Recorded as a disagreement, not re-labelled
+([golden report](evals/golden/report.md)).
 
 ## Rubric map
 

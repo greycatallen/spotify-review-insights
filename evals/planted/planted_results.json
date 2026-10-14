@@ -1,0 +1,213 @@
+{
+  "note": "Synthetic planted errors on a copy; never written to the real run or used in business aggregates.",
+  "record_cases": [
+    {
+      "errors": [
+        "topic 'offline' not in common labels"
+      ],
+      "planted": "topic outside common labels",
+      "rejected": true
+    },
+    {
+      "errors": [
+        "severity 3.0 must be int 1-5"
+      ],
+      "planted": "severity as float",
+      "rejected": true
+    },
+    {
+      "errors": [
+        "sentiment -1.4 must be a finite number in [-1, 1]"
+      ],
+      "planted": "sentiment out of range",
+      "rejected": true
+    },
+    {
+      "errors": [
+        "evidence_quote is not an exact substring of the review text"
+      ],
+      "planted": "paraphrased quote",
+      "rejected": true
+    },
+    {
+      "errors": [
+        "needs_review must be boolean"
+      ],
+      "planted": "needs_review as string",
+      "rejected": true
+    },
+    {
+      "errors": [
+        "entities must be a list of nonempty strings"
+      ],
+      "planted": "empty entity",
+      "rejected": true
+    }
+  ],
+  "record_rejected": 6,
+  "source_state": "state/final.sqlite",
+  "verifier_cases": [
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "other",
+      "planted": "access",
+      "review_id": "1fa9ee9d-5e15-44fc-b9be-e706431a1f00",
+      "verifier": "other"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "praise",
+      "planted": "complaint",
+      "review_id": "2408a7d9-575f-446d-a32f-8125128fde66",
+      "verifier": "praise"
+    },
+    {
+      "field": "severity",
+      "flagged_by_comparison": true,
+      "original": 1,
+      "planted": 5,
+      "review_id": "4e9057e0-7fa5-41e9-a47c-7fb28144bbef",
+      "verifier": 1
+    },
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "playback",
+      "planted": "billing",
+      "review_id": "517b3790-ae63-46b8-a620-91fa3d8ebbdf",
+      "verifier": "playback"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "complaint",
+      "planted": "praise",
+      "review_id": "2684bbef-d950-4812-9995-c4c7e2bc01a8",
+      "verifier": "complaint"
+    },
+    {
+      "field": "severity",
+      "flagged_by_comparison": true,
+      "original": 3,
+      "planted": 1,
+      "review_id": "23a73762-b070-4bc2-a6b4-ad22b9d27fa0",
+      "verifier": 3
+    },
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "other",
+      "planted": "access",
+      "review_id": "380e14ab-0695-4c2b-bb0e-726e97d36273",
+      "verifier": "other"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "complaint",
+      "planted": "praise",
+      "review_id": "460c78ef-cebf-4004-a5f5-0618cbeb1450",
+      "verifier": "complaint"
+    },
+    {
+      "field": "severity",
+      "flagged_by_comparison": true,
+      "original": 1,
+      "planted": 5,
+      "review_id": "4bd723e6-bad2-41af-8754-ece5d460ffb8",
+      "verifier": 1
+    },
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "catalog",
+      "planted": "support",
+      "review_id": "2f14b1db-19d8-458f-8c03-ef4dcae8eeec",
+      "verifier": "catalog"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "complaint",
+      "planted": "praise",
+      "review_id": "43fdf65d-a9c4-45c3-abe5-ad36ffc4b016",
+      "verifier": "complaint"
+    },
+    {
+      "field": "severity",
+      "flagged_by_comparison": true,
+      "original": 3,
+      "planted": 1,
+      "review_id": "0167df98-8436-40b4-849f-b41bb0f6e188",
+      "verifier": 3
+    },
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "other",
+      "planted": "access",
+      "review_id": "04f52edc-dd32-4f93-bd5b-10658b1c740a",
+      "verifier": "other"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "praise",
+      "planted": "complaint",
+      "review_id": "67a39e18-fb02-4fe6-932b-294d8c0f7ce3",
+      "verifier": "praise"
+    },
+    {
+      "field": "severity",
+      "flagged_by_comparison": true,
+      "original": 2,
+      "planted": 5,
+      "review_id": "0714c88d-d7d1-49e1-a026-d4f1befe5288",
+      "verifier": 2
+    },
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "other",
+      "planted": "access",
+      "review_id": "6e3918ea-5e50-4035-aa7b-3b565425ac95",
+      "verifier": "other"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "praise",
+      "planted": "complaint",
+      "review_id": "52d5f302-52a3-4178-92f1-ef27ad7f1a0b",
+      "verifier": "praise"
+    },
+    {
+      "field": "severity",
+      "flagged_by_comparison": true,
+      "original": 1,
+      "planted": 5,
+      "review_id": "125c797c-15c2-41d8-9841-68e9fc20660d",
+      "verifier": 1
+    },
+    {
+      "field": "topic",
+      "flagged_by_comparison": true,
+      "original": "other",
+      "planted": "access",
+      "review_id": "4938122f-1a1f-4287-a019-62b6e5b191a1",
+      "verifier": "other"
+    },
+    {
+      "field": "intent",
+      "flagged_by_comparison": true,
+      "original": "praise",
+      "planted": "complaint",
+      "review_id": "7233789a-1324-417c-93f7-dff5f7c2cd18",
+      "verifier": "praise"
+    }
+  ],
+  "verifier_flagged": 20,
+  "verifier_planted": 20
+}
