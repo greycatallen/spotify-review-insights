@@ -1,0 +1,394 @@
+[
+  {
+    "cost_usd": 4.040400000000001e-05,
+    "input_tokens": 962,
+    "latency_s": 0.1168,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9bc77f21ad541044ce5474c9"
+  },
+  {
+    "cost_usd": 3.3096e-05,
+    "input_tokens": 788,
+    "latency_s": 0.0659,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9c1270949d6c82054bba41fb"
+  },
+  {
+    "cost_usd": 3.334800000000001e-05,
+    "input_tokens": 794,
+    "latency_s": 0.0788,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9c56728c8b4a6d9e37ad5315"
+  },
+  {
+    "cost_usd": 3.3306e-05,
+    "input_tokens": 793,
+    "latency_s": 0.062,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9ca679b3bf29841cdff907e5"
+  },
+  {
+    "cost_usd": 3.292800000000001e-05,
+    "input_tokens": 784,
+    "latency_s": 0.0661,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9ce777f5bda8dca11114f099"
+  },
+  {
+    "cost_usd": 3.3474000000000005e-05,
+    "input_tokens": 797,
+    "latency_s": 0.065,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9d2e7e748691c5a92068174f"
+  },
+  {
+    "cost_usd": 3.2802e-05,
+    "input_tokens": 781,
+    "latency_s": 0.0633,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9d6d7c73a1df69857b704cad"
+  },
+  {
+    "cost_usd": 3.3054000000000006e-05,
+    "input_tokens": 787,
+    "latency_s": 0.0798,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9daf713e9b9337e7460b839a"
+  },
+  {
+    "cost_usd": 3.313800000000001e-05,
+    "input_tokens": 789,
+    "latency_s": 0.0621,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9e0276639f6b08bb6fc63eb2"
+  },
+  {
+    "cost_usd": 3.313800000000001e-05,
+    "input_tokens": 789,
+    "latency_s": 0.0708,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9e45703db7d4b67c456df4ed"
+  },
+  {
+    "cost_usd": 3.427200000000001e-05,
+    "input_tokens": 816,
+    "latency_s": 0.0681,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9e8d7f308839c2d876ba7812"
+  },
+  {
+    "cost_usd": 4.296600000000001e-05,
+    "input_tokens": 1023,
+    "latency_s": 0.0662,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9ed27a33a44b1b5ed2362449"
+  },
+  {
+    "cost_usd": 3.2970000000000005e-05,
+    "input_tokens": 785,
+    "latency_s": 0.064,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9f1970e69a4111f0e629f1d2"
+  },
+  {
+    "cost_usd": 3.2844000000000006e-05,
+    "input_tokens": 782,
+    "latency_s": 0.0846,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9f5c76ca833a031130242f95"
+  },
+  {
+    "cost_usd": 3.2802e-05,
+    "input_tokens": 781,
+    "latency_s": 0.0819,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7e9fb37b368055f50ed085a3d4"
+  },
+  {
+    "cost_usd": 3.3474000000000005e-05,
+    "input_tokens": 797,
+    "latency_s": 0.0604,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea00775399267fe9dfc6b7354"
+  },
+  {
+    "cost_usd": 3.3012e-05,
+    "input_tokens": 786,
+    "latency_s": 0.0631,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea0457436ad6dcd94afa97c1c"
+  },
+  {
+    "cost_usd": 3.292800000000001e-05,
+    "input_tokens": 784,
+    "latency_s": 0.0603,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea08a77b497b245fc40acae93"
+  },
+  {
+    "cost_usd": 3.3264000000000005e-05,
+    "input_tokens": 792,
+    "latency_s": 0.0625,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea0c6712fbcd636442ab830da"
+  },
+  {
+    "cost_usd": 3.3054000000000006e-05,
+    "input_tokens": 787,
+    "latency_s": 0.062,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea10970ffb62e0ffb7f2968fb"
+  },
+  {
+    "cost_usd": 3.3894000000000004e-05,
+    "input_tokens": 807,
+    "latency_s": 0.0695,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea146731aab08f18e29977596"
+  },
+  {
+    "cost_usd": 3.3936e-05,
+    "input_tokens": 808,
+    "latency_s": 0.0656,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea1907214ba4ac69760d6f9b5"
+  },
+  {
+    "cost_usd": 3.3558000000000006e-05,
+    "input_tokens": 799,
+    "latency_s": 0.0671,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea1d573c09b8791077ebcf9d5"
+  },
+  {
+    "cost_usd": 3.3684000000000005e-05,
+    "input_tokens": 802,
+    "latency_s": 0.0712,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea2197029b857b699d25cb638"
+  },
+  {
+    "cost_usd": 3.364200000000001e-05,
+    "input_tokens": 801,
+    "latency_s": 0.062,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea2647f91b459b5f16fe349b8"
+  },
+  {
+    "cost_usd": 3.3558000000000006e-05,
+    "input_tokens": 799,
+    "latency_s": 0.0734,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea2a5742c8b38139491fd2325"
+  },
+  {
+    "cost_usd": 3.3012e-05,
+    "input_tokens": 786,
+    "latency_s": 0.0622,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea2eb746ba85405981c7d4fb8"
+  },
+  {
+    "cost_usd": 3.3180000000000004e-05,
+    "input_tokens": 790,
+    "latency_s": 0.1686,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea32f71e5904fb4ac5017fa05"
+  },
+  {
+    "cost_usd": 4.2630000000000004e-05,
+    "input_tokens": 1015,
+    "latency_s": 0.0819,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea3db76eda6c54d15d9af64f5"
+  },
+  {
+    "cost_usd": 3.3516e-05,
+    "input_tokens": 798,
+    "latency_s": 0.0652,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea42e7a1a9e56991582a5eeb2"
+  },
+  {
+    "cost_usd": 3.3222e-05,
+    "input_tokens": 791,
+    "latency_s": 0.0998,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea47274469421f4faeb7e464b"
+  },
+  {
+    "cost_usd": 4.2294000000000005e-05,
+    "input_tokens": 1007,
+    "latency_s": 0.0652,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea4d77b61aede90a542bec0e6"
+  },
+  {
+    "cost_usd": 3.969000000000001e-05,
+    "input_tokens": 945,
+    "latency_s": 0.071,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea5197a19b70ae4fe1785c3a8"
+  },
+  {
+    "cost_usd": 3.3768000000000006e-05,
+    "input_tokens": 804,
+    "latency_s": 0.0686,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea563732893d18162d429dd9d"
+  },
+  {
+    "cost_usd": 3.2802e-05,
+    "input_tokens": 781,
+    "latency_s": 0.0691,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea5a87046981d32499035819f"
+  },
+  {
+    "cost_usd": 3.2886e-05,
+    "input_tokens": 783,
+    "latency_s": 0.0767,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea5f17bcd95b4b79b6ee99885"
+  },
+  {
+    "cost_usd": 3.3012e-05,
+    "input_tokens": 786,
+    "latency_s": 0.06,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea6427f64a53c60f323fe404a"
+  },
+  {
+    "cost_usd": 3.381e-05,
+    "input_tokens": 805,
+    "latency_s": 0.063,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea67d7c109c5c0afe40c44cbb"
+  },
+  {
+    "cost_usd": 3.292800000000001e-05,
+    "input_tokens": 784,
+    "latency_s": 0.0772,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea6be7a2c895357ed2d71f987"
+  },
+  {
+    "cost_usd": 3.406200000000001e-05,
+    "input_tokens": 811,
+    "latency_s": 0.0674,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea70d7949b17d444b45f809e3"
+  },
+  {
+    "cost_usd": 3.3180000000000004e-05,
+    "input_tokens": 790,
+    "latency_s": 0.0643,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea7537cdf973f15a5979c0b44"
+  },
+  {
+    "cost_usd": 3.8514000000000004e-05,
+    "input_tokens": 917,
+    "latency_s": 0.0627,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea7977b7f8b009cae3e007ce1"
+  },
+  {
+    "cost_usd": 3.855600000000001e-05,
+    "input_tokens": 918,
+    "latency_s": 0.0638,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea7d7709aa9473759baae3dd1"
+  },
+  {
+    "cost_usd": 3.3306e-05,
+    "input_tokens": 793,
+    "latency_s": 0.0645,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea8187165b3aba1f1f5363f1e"
+  },
+  {
+    "cost_usd": 3.3054000000000006e-05,
+    "input_tokens": 787,
+    "latency_s": 0.0688,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea85f7de1a868246d5513cc25"
+  },
+  {
+    "cost_usd": 3.3768000000000006e-05,
+    "input_tokens": 804,
+    "latency_s": 0.0706,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea8a476fbb40350ef69a1260f"
+  },
+  {
+    "cost_usd": 3.3306e-05,
+    "input_tokens": 793,
+    "latency_s": 0.0753,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea8e879329bf0a6f74ec9c673"
+  },
+  {
+    "cost_usd": 3.3096e-05,
+    "input_tokens": 788,
+    "latency_s": 0.0631,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea93674819efd97955cb9b2aa"
+  },
+  {
+    "cost_usd": 3.2886e-05,
+    "input_tokens": 783,
+    "latency_s": 0.0646,
+    "model": "jev-1.13.0",
+    "outcome": "succeeded",
+    "request_id": "req_01a13b7ea9777ccbacfda8ba6fd42ce1"
+  }
+]

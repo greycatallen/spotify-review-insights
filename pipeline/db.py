@@ -101,6 +101,9 @@ CREATE TABLE IF NOT EXISTS spend (
     updated_at TEXT NOT NULL
 );
 
+-- Optional run scope (e.g. the seeded 100k sample). Empty table = every row is in scope.
+CREATE TABLE IF NOT EXISTS scope (review_id TEXT PRIMARY KEY);
+
 CREATE TABLE IF NOT EXISTS issues (
     issue_id TEXT PRIMARY KEY,
     topic TEXT NOT NULL,

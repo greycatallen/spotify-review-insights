@@ -49,7 +49,9 @@ def dedupe(con):
             INSERT INTO texts(text_sha256, canonical_id, n_reviews, char_len)
             SELECT text_sha256, review_id, n, length(review_text) FROM (
                 SELECT text_sha256, review_id, review_text, min(src_order), count(*) AS n
-                FROM reviews WHERE is_empty = 0 GROUP BY text_sha256)
+                FROM reviews WHERE is_empty = 0
+                  AND (NOT EXISTS (SELECT 1 FROM scope) OR review_id IN (SELECT review_id FROM scope))
+                GROUP BY text_sha256)
         """)
     return sql_profile(con)
 
@@ -71,3 +73,19 @@ def top_duplicates(con, limit=10):
     return [dict(r) for r in con.execute(
         "SELECT t.n_reviews, r.review_text FROM texts t JOIN reviews r ON r.review_id = t.canonical_id "
         "ORDER BY t.n_reviews DESC, t.text_sha256 LIMIT ?", (limit,))]
+
+
+def select_scope(con, n, seed, exclude_ids=()):
+    """Seeded random sample of n NONEMPTY reviews: lowest SHA-256(seed + ':' + review_id), excluding the
+    given IDs (the golden 50). Deterministic and reproducible from the seed; rebuilds the dedupe table so
+    exact-text reuse happens only inside the sample. Returns (count, sha256 of the sorted ID list)."""
+    import hashlib
+    exclude = set(exclude_ids)
+    keyed = sorted((hashlib.sha256(f"{seed}:{r[0]}".encode()).hexdigest(), r[0]) for r in
+                   con.execute("SELECT review_id FROM reviews WHERE is_empty = 0") if r[0] not in exclude)
+    chosen = sorted(rid for _, rid in keyed[:n])
+    with transaction(con):
+        con.execute("DELETE FROM scope")
+        con.executemany("INSERT INTO scope VALUES (?)", [(r,) for r in chosen])
+    dedupe(con)
+    return len(chosen), hashlib.sha256("\n".join(chosen).encode()).hexdigest()

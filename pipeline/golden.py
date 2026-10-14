@@ -59,6 +59,8 @@ def validate(path):
                       "severity": p["severity"][0] if p["severity"] else None, "sentiment": sentiment,
                       "entities": entities, "evidence_quote": p["evidence_quote"],
                       "needs_review": {"true": True, "false": False}.get(p["needs_review"])}
+            if not single["evidence_quote"].strip():
+                single["evidence_quote"] = originals.get(rid, row)["review_text"]   # human quote is optional
             errs += [e for e in record_errors(single, originals.get(rid, row)["review_text"])
                      if not e.startswith(("topic", "intent", "severity"))]
         if errs:

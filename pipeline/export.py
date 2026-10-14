@@ -25,11 +25,17 @@ def iter_records(con, label_configs):
     results = final_results(con, label_configs)
     failures = {r["text_sha256"]: r["last_reason"] for r in con.execute(
         "SELECT text_sha256, last_reason FROM failures WHERE label_config=?", (label_configs[0],))}
+    scoped = con.execute("SELECT EXISTS (SELECT 1 FROM scope)").fetchone()[0]
+    in_scope = {r[0] for r in con.execute("SELECT review_id FROM scope")} if scoped else None
     for row in con.execute("SELECT review_id, review_text, source_sha256, text_sha256, is_empty FROM reviews "
                            "ORDER BY src_order"):
         base = {"review_id": row["review_id"], "source_sha256": row["source_sha256"]}
         if row["is_empty"]:
             yield {**base, "status": "quarantined", "reason": EMPTY_REASON}
+            continue
+        if in_scope is not None and row["review_id"] not in in_scope:
+            # Accounted for but deliberately not classified: outside the declared 100k sample.
+            yield {**base, "status": "quarantined", "reason": "not_in_scope"}
             continue
         res = results.get(row["text_sha256"])
         if res is None:

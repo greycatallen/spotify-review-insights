@@ -57,7 +57,8 @@ def check_memo(text, claims, context):
     cited = set(re.findall(r"\[(C\d+)\]", text))
     allowed = {c[3] for c in claims} | {str(v) for v in _flatten(context)}
     allowed |= {a.rstrip("0").rstrip(".") for a in allowed if "." in a}
-    numbers = set(re.findall(r"(?<![\w\[])\d[\d,]*(?:\.\d+)?", re.sub(r"\[C\d+\]", "", text)))
+    numbers = {n.rstrip(",") for n in re.findall(r"(?<![\w\[])\d[\d,]*(?:\.\d+)?",
+                                                  re.sub(r"\[?C\d+\]?", "", text))}
     unexplained = sorted(n for n in numbers if n.replace(",", "") not in allowed and n not in allowed
                          and not (n.isdigit() and int(n) <= 10))   # small ordinals like "top 3" / "1)"
     return {"unknown_claim_ids": sorted(cited - ids), "claims_cited": sorted(cited & ids, key=lambda c: int(c[1:])),

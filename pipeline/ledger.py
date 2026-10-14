@@ -25,16 +25,20 @@ def now():
 
 
 class SpendLedger:
-    def __init__(self, con, cap_usd: float, run_id: str, lock=None):
-        self.con, self.cap, self.run_id = con, float(cap_usd), run_id
+    def __init__(self, con, cap_usd: float, run_id: str, lock=None, scope: str | None = None):
+        """scope (e.g. a provider name) gives this ledger its own cap: its entries are stored as
+        "<scope>:<run_id>" and only those count toward it. Without a scope, every entry counts."""
+        self.con, self.cap, self.scope = con, float(cap_usd), scope
+        self.run_id = f"{scope}:{run_id}" if scope else run_id
         self.lock = lock or threading.Lock()
 
     def committed(self) -> float:
         """Settled actuals + open/unreconciled reservations, across all runs in this state file."""
-        row = self.con.execute("""
+        where, args = ("WHERE run_id LIKE ?", (f"{self.scope}:%",)) if self.scope else ("", ())
+        row = self.con.execute(f"""
             SELECT coalesce(sum(CASE WHEN status='settled' THEN actual_usd
                                      WHEN status IN ('reserved','unreconciled') THEN reserved_usd
-                                     ELSE 0 END), 0) FROM spend""").fetchone()
+                                     ELSE 0 END), 0) FROM spend {where}""", args).fetchone()
         return float(row[0])
 
     def reserve(self, usd: float) -> int:
@@ -62,8 +66,9 @@ class SpendLedger:
 
     def mark_stale_unreconciled(self) -> int:
         with self.lock, transaction(self.con):
-            return self.con.execute("UPDATE spend SET status='unreconciled', updated_at=? WHERE status='reserved'",
-                                    (now(),)).rowcount
+            where, args = (" AND run_id LIKE ?", (f"{self.scope}:%",)) if self.scope else ("", ())
+            return self.con.execute("UPDATE spend SET status='unreconciled', updated_at=? WHERE status='reserved'" + where,
+                                    (now(), *args)).rowcount
 
 
 class RateLimiter:

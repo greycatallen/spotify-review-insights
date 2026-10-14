@@ -10,7 +10,7 @@ import random
 from .memo import check_memo
 from .stage_call import cached_json_call
 
-PROMPT_VERSION = "recommend-v1"
+PROMPT_VERSION = "recommend-v2"
 
 SYSTEM = """You advise Spotify's product team on where the next quarter of product effort should go
 (access, usability, playback, downloads, catalog, billing/support), using ONLY the saved analysis given
@@ -21,8 +21,10 @@ Rules:
 - Recommend 3 to 6 concrete actions, most important first. Each action must cite the issue_ids or
   request theme ids it addresses, the claim_ids (e.g. "C1") whose numbers support it, and 1-3
   evidence_review_ids taken only from the examples provided.
-- Copy numbers exactly as given and cite claim IDs for issue-level numbers. Do not compute new numbers,
+- Copy every number character for character as given (mean severity "3.458333", never "3.46") and
+  cite its claim ID. Never add, combine, average or round numbers across issues, and never compute
   percentages, revenue, churn, user counts or causes. Counts are reviews, not users.
+- Put review IDs only in evidence_review_ids, copied exactly; never write review IDs in prose.
 - Cancellation language is stated intent, not observed churn. Reviews are self-selected public text.
 - Also state the single top priority area, two alternatives you considered and why they rank lower, and
   key limitations.
@@ -74,6 +76,18 @@ def evidence_pack(issues, claims, members, quotes, themes, theme_names, context,
     return {"complaint_issues": pack_issues, "request_themes": pack_themes, "context": context}
 
 
+def _allowed_context(pack):
+    """Numbers the AI may state without a claim ID: run context, theme counts, ranks, and numbers that
+    appear verbatim in the example quotes it was given (customer statements, not metrics)."""
+    import re
+    ctx = dict(pack["context"]) | {f"theme_{t['theme_id']}": t["request_count"] for t in pack["request_themes"]}
+    ctx |= {f"rank_{i['issue_id']}": i["rank"] for i in pack["complaint_issues"]}
+    quotes = [e["quote"] for i in pack["complaint_issues"] for e in i["examples"]] + \
+             [e["quote"] for t in pack["request_themes"] for e in t["examples"]]
+    ctx["quoted_numbers"] = sorted({n for q in quotes for n in re.findall(r"\d+(?:\.\d+)?", q)})
+    return ctx
+
+
 def validate(out, pack, claims):
     """Code check of every cited ID and number. Returns problems (empty lists = grounded)."""
     issue_ids = {i["issue_id"] for i in pack["complaint_issues"]} | {t["theme_id"] for t in pack["request_themes"]}
@@ -83,7 +97,7 @@ def validate(out, pack, claims):
     probs = {"unknown_issue_ids": [], "unknown_claim_ids": [], "unknown_review_ids": [], "unexplained_numbers": []}
     texts = [out["top_priority"]["summary"]] + [a[k] for a in out["actions"] for k in ("title", "recommendation", "rationale")] \
         + [x["why_lower"] for x in out["alternatives"]] + out["limitations"]
-    context_numbers = dict(pack["context"]) | {f"theme_{t['theme_id']}": t["request_count"] for t in pack["request_themes"]}
+    context_numbers = _allowed_context(pack)
     probs["unexplained_numbers"] = sorted(set(sum((check_memo(t, claims, context_numbers)["unexplained_numbers"]
                                                    for t in texts), [])))
     for a in out["actions"]:
@@ -100,6 +114,16 @@ def recommend(con, pack, claims, *, run_id, ledger, model="claude-haiku-4-5", al
         payload=pack, schema=SCHEMA, max_tokens=2500, review_ids=(), est_cost=0.04,
         allow_call=allow_call)
     problems = validate(out, pack, claims)
+    attempts = 1
+    if any(problems.values()):
+        # One bounded corrective retry with the code-check findings; the result is re-checked and reported as is.
+        fix = {**pack, "previous_draft": out, "code_check_problems": problems,
+               "instruction": "Return the draft with every listed problem fixed; change nothing else."}
+        out, request_id, cached2 = cached_json_call(
+            con, role="memo", run_id=run_id, ledger=ledger, model=model, prompt_version=PROMPT_VERSION + "-fix",
+            system=SYSTEM, payload=fix, schema=SCHEMA, max_tokens=2500, review_ids=(), est_cost=0.04,
+            allow_call=allow_call)
+        problems, cached, attempts = validate(out, pack, claims), cached and cached2, 2
     # Ungrounded citations are dropped from the action (and reported), never shown as evidence.
     issue_ok = {i["issue_id"] for i in pack["complaint_issues"]} | {t["theme_id"] for t in pack["request_themes"]}
     review_ok = {e["review_id"] for i in pack["complaint_issues"] for e in i["examples"]} | \
@@ -109,5 +133,6 @@ def recommend(con, pack, claims, *, run_id, ledger, model="claude-haiku-4-5", al
         a["issue_ids"] = [i for i in a["issue_ids"] if i in issue_ok]
         a["claim_ids"] = [c for c in a["claim_ids"] if c in claim_ok]
         a["evidence_review_ids"] = [r for r in a["evidence_review_ids"] if r in review_ok]
-    return {"output": out, "audit": problems, "request_id": request_id, "cached": cached, "model": model,
+    return {"output": out, "audit": problems, "attempts": attempts, "request_id": request_id, "cached": cached,
+            "model": model,
             "prompt_version": PROMPT_VERSION}
