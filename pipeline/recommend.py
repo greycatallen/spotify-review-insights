@@ -10,7 +10,7 @@ import random
 from .memo import check_memo
 from .stage_call import cached_json_call
 
-PROMPT_VERSION = "recommend-v2"
+PROMPT_VERSION = "recommend-v3"
 
 SYSTEM = """You advise Spotify's product team on where the next quarter of product effort should go
 (access, usability, playback, downloads, catalog, billing/support), using ONLY the saved analysis given
@@ -25,6 +25,14 @@ Rules:
   cite its claim ID. Never add, combine, average or round numbers across issues, and never compute
   percentages, revenue, churn, user counts or causes. Counts are reviews, not users.
 - Put review IDs only in evidence_review_ids, copied exactly; never write review IDs in prose.
+- Use comparative words (highest, largest, most, top) only when the given ranks support them: each
+  issue has rank (by priority_score) and mean_severity_rank (1 = highest mean severity); each request
+  theme has rank_by_request_count out of themes_total. Only the top themes are included, so never call
+  an included theme the lowest or smallest overall. Request counts and complaint counts are different
+  measures: compare request themes only with request themes, and issues only with issues.
+- Never say or imply that users are leaving, switching to competitors, churning, abandoning the app
+  or being lost, and never claim effects on retention, conversion or revenue; reviews show stated intent
+  only. Describe what reviewers report.
 - Cancellation language is stated intent, not observed churn. Reviews are self-selected public text.
 - Also state the single top priority area, two alternatives you considered and why they rank lower, and
   key limitations.
@@ -61,16 +69,21 @@ def evidence_pack(issues, claims, members, quotes, themes, theme_names, context,
         cid.setdefault(c[1], {})[c[2]] = c[0]
     pick = lambda ids: sorted(ids, key=lambda r: random.Random(f"{seed}:{r}").random())[:per_issue]
     pack_issues = []
+    in_pack = [r for r in issues if r["issue_id"] in cid]
+    sev_rank = {r["issue_id"]: i for i, r in enumerate(
+        sorted(in_pack, key=lambda r: (-float(r["mean_severity"]), r["issue_id"])), 1)}
     for r in issues:
         if r["issue_id"] not in cid:
             continue
         pack_issues.append({
-            "rank": r["rank"], "issue_id": r["issue_id"], "name": r.get("name"), "topic": r["issue_id"].split(".")[0],
+            "rank": r["rank"], "mean_severity_rank": sev_rank[r["issue_id"]], "issue_id": r["issue_id"], "name": r.get("name"), "topic": r["issue_id"].split(".")[0],
             "complaint_count": {"value": r["complaint_count"], "claim_id": cid[r["issue_id"]]["complaint_count"]},
             "mean_severity": {"value": r["mean_severity"], "claim_id": cid[r["issue_id"]]["mean_severity"]},
             "priority_score": {"value": r["priority_score"], "claim_id": cid[r["issue_id"]]["priority_score"]},
             "examples": [{"review_id": rid, "quote": quotes[rid][:240]} for rid in pick(members[r["issue_id"]])]})
-    pack_themes = [{"theme_id": t, "name": theme_names.get(t, {}).get("name", t), "request_count": len(themes[t]),
+    theme_order = sorted(themes, key=lambda t: (-len(themes[t]), t))
+    pack_themes = [{"theme_id": t, "rank_by_request_count": theme_order.index(t) + 1, "themes_total": len(themes),
+                    "name": theme_names.get(t, {}).get("name", t), "request_count": len(themes[t]),
                     "examples": [{"review_id": rid, "quote": quotes[rid][:240]} for rid in pick(themes[t])]}
                    for t in sorted(themes, key=lambda t: (-len(themes[t]), t))[:8]]
     return {"complaint_issues": pack_issues, "request_themes": pack_themes, "context": context}
@@ -94,12 +107,19 @@ def validate(out, pack, claims):
     review_ids = {e["review_id"] for i in pack["complaint_issues"] for e in i["examples"]} | \
                  {e["review_id"] for t in pack["request_themes"] for e in t["examples"]}
     claim_ids = {c[0] for c in claims}
-    probs = {"unknown_issue_ids": [], "unknown_claim_ids": [], "unknown_review_ids": [], "unexplained_numbers": []}
+    probs = {"unknown_issue_ids": [], "unknown_claim_ids": [], "unknown_review_ids": [], "unexplained_numbers": [],
+             "unsupported_departure_language": []}
     texts = [out["top_priority"]["summary"]] + [a[k] for a in out["actions"] for k in ("title", "recommendation", "rationale")] \
         + [x["why_lower"] for x in out["alternatives"]] + out["limitations"]
     context_numbers = _allowed_context(pack)
     probs["unexplained_numbers"] = sorted(set(sum((check_memo(t, claims, context_numbers)["unexplained_numbers"]
                                                    for t in texts), [])))
+    import re
+    banned = re.compile(r"\b(churn\w*|leav(e|es|ing)\b|switch(es|ing)? to|abandon\w*|los(e|ing) (users|customers)|"
+                        r"defect(ing|ion)|migrat(e|ing) to|driv(e|es|ing) (users|people) away|retention|retain\w*|"
+                        r"revenue|conversion)", re.I)
+    claims_text = texts[:len(texts) - len(out["limitations"])]   # limitations may say "not churn"; that is correct
+    probs["unsupported_departure_language"] = sorted({m.group(0).lower() for t in claims_text for m in banned.finditer(t)})
     for a in out["actions"]:
         probs["unknown_issue_ids"] += [i for i in a["issue_ids"] if i not in issue_ids]
         probs["unknown_claim_ids"] += [c for c in a["claim_ids"] if c not in claim_ids]

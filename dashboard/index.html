@@ -66,7 +66,7 @@ th { color: var(--text-secondary); font-weight: 600; font-size: 13px; }
 td.num, th.num { text-align: right; }
 tbody tr.clickable { cursor: pointer; }
 tbody tr.clickable:hover, tbody tr.clickable:focus { background: var(--surface-2); outline: none; }
-.bar-cell { min-width: 150px; }
+.bar-cell { min-width: 120px; white-space: nowrap; }
 .bar-cell .bc { display: flex; align-items: center; gap: 8px; }
 .bar-cell span.bar { display: inline-block; height: 8px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--accent); }
 .bar-cell span.lab { font-variant-numeric: tabular-nums; }
@@ -319,7 +319,7 @@ function recs(R) {
   }
   const r = R.recommendations, a = prov.audit || {};
   const removed = (a.unknown_issue_ids || []).length + (a.unknown_claim_ids || []).length + (a.unknown_review_ids || []).length;
-  const flagged = a.unexplained_numbers || [];
+  const flagged = (a.unexplained_numbers || []).concat((a.unsupported_departure_language || []).map(w => `"${w}"`));
   const badges = [
     removed ? `<span class="badge warn">⚠ ${removed} invalid ID(s) removed by code</span>` : `<span class="badge ok">✓ all cited IDs exist</span>`,
     flagged.length ? `<span class="badge warn" title="Numbers in the prose that are not a saved claim, context number or quoted figure">⚠ for human review: ${flagged.map(esc).join(", ")}</span>`
@@ -342,7 +342,7 @@ async function issues(kind) {
     : `<tr><th class="num">Rank</th><th>Request theme</th><th>Topic</th><th>Requests</th></tr>`;
   const body = rows.map(r => {
     const score = kind === "complaint" ? r.priority_score : r.complaint_count;
-    const barTd = `<td class="bar-cell"><div class="bc"><span class="bar" style="width:${(80 * score / max).toFixed(1)}px"></span><span class="lab">${fmt(score)}</span></div></td>`;
+    const barTd = `<td class="bar-cell"><div class="bc"><span class="bar" style="width:${(56 * score / max).toFixed(1)}px"></span><span class="lab">${fmt(score)}</span></div></td>`;
     return `<tr class="clickable" tabindex="0" data-issue="${esc(r.issue_id)}"><td class="num">${r.rank}</td><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.issue_id)}</span></td><td>${esc(r.topic)}</td>` +
       (kind === "complaint" ? `<td class="num">${fmt(r.complaint_count)}</td><td class="num">${esc(r.mean_severity)}</td>${barTd}<td class="num">${fmt(r.cancellation_count)}</td>` : barTd) + "</tr>";
   }).join("");

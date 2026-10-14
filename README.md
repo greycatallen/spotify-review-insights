@@ -67,7 +67,7 @@ and as a complaint by the labeller. Recorded as a disagreement, not re-labelled
 | **D1** accessible code/setup and artifacts | [Setup](#setup), `requirements*.txt`, `.env.example`, `grading/`, `cost/`, live dashboard |
 | **D2** architecture, shared schema, provenance | [docs/architecture.md](docs/architecture.md), `pipeline/rubric.py` (shared definitions), `pipeline/schema.py`, `label_config` + `source_sha256` + `cache_source_id` on every record |
 | **D3** memo numbers linked to calculations | [memo.md](memo.md) cites `grading/claims.csv` IDs; code audit in `run_summary.json` → `stages.memo.audit`; `python -m pipeline.cli rank` recomputes the ranking |
-| **D4** recommendation, alternatives, limitations | [memo.md](memo.md); dashboard "AI recommendations" (alternatives + limits, every ID/number code-checked) |
+| **D4** recommendation, alternatives, limitations | [memo.md](memo.md); dashboard "AI recommendations" (alternatives + limits; IDs, numbers and churn/retention wording code-checked; residual issues listed at the end of memo.md) |
 | **T1** 50 human labels, per-field comparison, error analysis | [evals/golden/report.md](evals/golden/report.md), `golden/golden_50_labeled.csv`, `golden/label_fixes.csv` |
 | **T2** independent verification, planted errors, injection | `run_summary.json` → `verification`; [evals/planted/planted_results.json](evals/planted/planted_results.json); synthetic injection in [evals/golden/report.md](evals/golden/report.md); [evals/test_suite_report.txt](evals/test_suite_report.txt) |
 | **T3** real 100-review cold/warm pilot, calculator, controls | [cost/README.md](cost/README.md), [cost/report.md](cost/report.md), `cost/pilot_*`, `cost/pilot_attempt1/`, `cost/dev/` |

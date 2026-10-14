@@ -66,3 +66,11 @@ the range citation "[C10-C12]" expanded into individual claim IDs; "100000 verif
 to classified; removed the drafts' unsupported churn wording ("causing active churn", "drive immediate
 cancellation"); added the baseline table, alternatives and representative review IDs required by the
 brief. All numbers above are copied from `grading/claims.csv` or `evals/verification/verification_summary.json`.
+
+*Dashboard recommendations (AI, `recommend-v3`, shown as generated).* After human review of earlier
+versions, the prompt and code check were tightened: superlatives must match supplied ranks, request
+counts may not be compared with complaint counts, and departure/churn/retention/revenue wording is
+flagged in code. Residual issues in the published text, left visible rather than edited: "aggressive
+premium conversion tactics" (paraphrase of reviewers; flagged on the dashboard badge), and one
+alternative still compares catalog requests with ad complaints ("ranks below … ad reduction in …
+volume"), which mixes two different measures. Published text: `evals/memo/recommendations_ai_dashboard_v3.json`.
